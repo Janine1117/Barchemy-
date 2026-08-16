@@ -1,0 +1,1 @@
+{"expo":{"name":"Barchemy","slug":"barchemy","version":"1.0.0","orientation":"portrait","scheme":"barchemy","userInterfaceStyle":"dark","ios":{"supportsTablet":true,"bundleIdentifier":"com.barchemy.app"},"android":{"package":"com.barchemy.app"},"plugins":["expo-router"]}}
