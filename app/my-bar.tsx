@@ -1,0 +1,4 @@
+import {StyleSheet,Text,View} from "react-native";
+export default function Bar(){return <View style={s.c}><Text style={s.e}>MY BAR</Text><Text style={s.t}>What do you have?</Text><Text style={s.copy}>The production database is ready for persistent inventory. This screen is the next implementation target.</Text>
+{["Spirits","Liqueurs & Syrups","Mixers","Fresh Ingredients","Garnishes","Equipment"].map(x=><View key={x} style={s.item}><Text style={s.text}>{x}</Text></View>)}</View>}
+const s=StyleSheet.create({c:{flex:1,backgroundColor:"#120F14",padding:28,paddingTop:70},e:{color:"#D6A84F",letterSpacing:2},t:{color:"#F4E9D0",fontSize:30,fontWeight:"700",marginTop:10},copy:{color:"#BDB4BE",lineHeight:22,marginVertical:18},item:{backgroundColor:"#211A25",padding:17,borderRadius:14,marginTop:9,borderWidth:1,borderColor:"#3B303F"},text:{color:"#F4E9D0",fontSize:16}})
