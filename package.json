@@ -4,7 +4,7 @@
   "scripts":{"start":"expo start","web":"expo start --web"},
   "dependencies":{
     "@supabase/supabase-js":"^2.57.0","expo":"~53.0.0",
-    "expo-router":"~5.1.0","react":"19.0.0","react-native":"0.79.2"
+    "expo-router":"~5.1.0","react":"19.0.0", "react-dom":"19.0.0", "react-native-web":"^0.20.0","react-native":"0.79.2"
   },
   "devDependencies":{"@types/react":"~19.0.10","typescript":"~5.8.3"}
 }
