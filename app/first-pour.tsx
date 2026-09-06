@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { router } from "expo-router";
 import { StyleSheet, Text, View, Pressable } from "react-native";
-import { supabase } from "../supabase";
+import { supabase } from "../Supabase";
 
 export default function Pour() {
   const [saving, setSaving] = useState(false);
