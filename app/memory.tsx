@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { router } from "expo-router";
 import { StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
-import { supabase } from "../supabase";
+import { supabase } from "../Supabase";
 
 type Memory = {
   id: string;
