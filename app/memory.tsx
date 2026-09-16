@@ -1,103 +1,60 @@
-import { useEffect, useState } from "react";
-import { router } from "expo-router";
-import { StyleSheet, Text, View, Pressable, ScrollView } from "react-native";
-import { supabase } from "../Supabase";
-
-type Memory = {
-  id: string;
-  title: string;
-  note: string | null;
-  created_at: string;
-};
+import { useCallback, useEffect, useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { loadMemories, type MemoryRow } from "../lib/memories";
 
 export default function Memory() {
-  const [memories, setMemories] = useState<Memory[]>([]);
+  const [memories, setMemories] = useState<MemoryRow[]>([]);
+  const [message, setMessage] = useState("Loading your memories…");
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
 
-  useEffect(() => {
-    loadMemories();
+  const refresh = useCallback(async () => {
+    setLoading(true);
+
+    try {
+      const result = await loadMemories();
+      setMemories(result.memories);
+
+      if (!result.ok) {
+        setMessage(result.message);
+      } else if (result.memories.length === 0) {
+        setMessage("No memories saved yet. Save a cocktail from The First Pour.");
+      } else {
+        setMessage("");
+      }
+    } catch (error) {
+      setMemories([]);
+      setMessage(error instanceof Error ? error.message : "Unable to load memories.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  async function loadMemories() {
-    setLoading(true);
-    setMessage("");
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      setLoading(false);
-      setMessage("Sign in to see your saved cocktail memories.");
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from("memories")
-      .select("id,title,note,created_at")
-      .order("created_at", { ascending: false });
-
-    setLoading(false);
-
-    if (error) {
-      setMessage(error.message);
-      return;
-    }
-
-    setMemories(data ?? []);
-  }
-
-  function formatDate(value: string) {
-    return new Date(value).toLocaleDateString();
-  }
+  useEffect(() => {
+    void refresh();
+  }, [refresh]);
 
   return (
-    <ScrollView
-      style={s.scroll}
-      contentContainerStyle={s.c}
-    >
-      <Text style={s.e}>MEMORY WALL</Text>
-      <Text style={s.t}>Capture the magic.</Text>
+    <ScrollView contentContainerStyle={s.container}>
+      <Text style={s.eyebrow}>MEMORY WALL</Text>
+      <Text style={s.title}>Capture the magic.</Text>
 
-      {loading && <Text style={s.status}>Loading your memories...</Text>}
-
-      {!loading && message !== "" && (
+      {message ? (
         <View style={s.card}>
-          <Text style={s.h}>Your memories will live here.</Text>
+          <Text style={s.heading}>{loading ? "One moment…" : "Your memories live here."}</Text>
           <Text style={s.copy}>{message}</Text>
-
-          <Pressable style={s.btn} onPress={() => router.push("/auth")}>
-            <Text style={s.btnText}>SIGN IN</Text>
-          </Pressable>
         </View>
-      )}
+      ) : null}
 
-      {!loading && message === "" && memories.length === 0 && (
-        <View style={s.card}>
-          <Text style={s.h}>Your memories will live here.</Text>
-          <Text style={s.copy}>
-            Save your first cocktail moment and it will appear here.
-          </Text>
+      {memories.map((memory) => (
+        <View key={memory.id} style={s.card}>
+          <Text style={s.heading}>{memory.title}</Text>
+          <Text style={s.copy}>{memory.recipe}</Text>
+          <Text style={s.date}>{new Date(memory.created_at).toLocaleString()}</Text>
         </View>
-      )}
+      ))}
 
-      {!loading &&
-        message === "" &&
-        memories.map((memory) => (
-          <View key={memory.id} style={s.memoryCard}>
-            <Text style={s.memoryTitle}>{memory.title}</Text>
-
-            {memory.note && (
-              <Text style={s.memoryNote}>{memory.note}</Text>
-            )}
-
-            <Text style={s.date}>{formatDate(memory.created_at)}</Text>
-          </View>
-        ))}
-
-      <Pressable onPress={() => router.push("/home")}>
-        <Text style={s.back}>Back to J.Bink's Bar</Text>
+      <Pressable accessibilityRole="button" onPress={() => void refresh()} style={s.refreshButton}>
+        <Text style={s.refreshText}>{loading ? "LOADING…" : "REFRESH MEMORIES"}</Text>
       </Pressable>
 
       <Text style={s.toast}>Sip. Smile. Repeat.</Text>
@@ -106,89 +63,20 @@ export default function Memory() {
 }
 
 const s = StyleSheet.create({
-  scroll: {
-    flex: 1,
+  container: {
+    flexGrow: 1,
     backgroundColor: "#120F14",
-  },
-  c: {
     padding: 28,
     paddingTop: 70,
-    paddingBottom: 50,
+    paddingBottom: 48,
   },
-  e: {
-    color: "#D6A84F",
-    letterSpacing: 2,
-  },
-  t: {
-    color: "#F4E9D0",
-    fontSize: 30,
-    fontWeight: "700",
-    marginTop: 10,
-  },
-  status: {
-    color: "#BDB4BE",
-    marginTop: 30,
-  },
-  card: {
-    backgroundColor: "#211A25",
-    padding: 24,
-    borderRadius: 20,
-    marginTop: 30,
-  },
-  h: {
-    color: "#F4E9D0",
-    fontSize: 19,
-    fontWeight: "700",
-  },
-  copy: {
-    color: "#BDB4BE",
-    lineHeight: 23,
-    marginTop: 10,
-  },
-  btn: {
-    backgroundColor: "#D6A84F",
-    padding: 14,
-    borderRadius: 13,
-    marginTop: 20,
-  },
-  btnText: {
-    color: "#160F12",
-    textAlign: "center",
-    fontWeight: "700",
-  },
-  memoryCard: {
-    backgroundColor: "#211A25",
-    padding: 22,
-    borderRadius: 20,
-    marginTop: 16,
-    borderWidth: 1,
-    borderColor: "#55405E",
-  },
-  memoryTitle: {
-    color: "#D6A84F",
-    fontSize: 21,
-    fontWeight: "700",
-  },
-  memoryNote: {
-    color: "#F4E9D0",
-    fontSize: 16,
-    marginTop: 10,
-    lineHeight: 23,
-  },
-  date: {
-    color: "#8F858F",
-    fontSize: 13,
-    marginTop: 14,
-  },
-  back: {
-    color: "#D6A84F",
-    marginTop: 28,
-    textAlign: "center",
-  },
-  toast: {
-    color: "#D6A84F",
-    marginTop: 30,
-    fontStyle: "italic",
-    textAlign: "center",
-  },
+  eyebrow: { color: "#D6A84F", letterSpacing: 2 },
+  title: { color: "#F4E9D0", fontSize: 30, fontWeight: "700", marginTop: 10 },
+  card: { backgroundColor: "#211A25", padding: 22, borderRadius: 20, marginTop: 18 },
+  heading: { color: "#F4E9D0", fontSize: 19, fontWeight: "700" },
+  copy: { color: "#BDB4BE", lineHeight: 23, marginTop: 10 },
+  date: { color: "#8E858F", fontSize: 12, marginTop: 14 },
+  refreshButton: { borderWidth: 1, borderColor: "#D6A84F", padding: 14, borderRadius: 12, marginTop: 20 },
+  refreshText: { color: "#D6A84F", textAlign: "center", fontWeight: "700" },
+  toast: { color: "#D6A84F", textAlign: "center", marginTop: 28 },
 });
