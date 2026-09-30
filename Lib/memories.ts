@@ -8,30 +8,62 @@ export type MemoryRow = {
   created_at: string;
 };
 
+const LOCAL_KEY = "barchemy.memories.v1";
+
+function getStorage() {
+  try {
+    return (globalThis as any).localStorage ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function readLocalMemories(): MemoryRow[] {
+  const storage = getStorage();
+  if (!storage) return [];
+
+  try {
+    const raw = storage.getItem(LOCAL_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as MemoryRow[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalMemories(memories: MemoryRow[]) {
+  const storage = getStorage();
+  if (!storage) return false;
+
+  try {
+    storage.setItem(LOCAL_KEY, JSON.stringify(memories));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function createLocalId() {
+  const cryptoObject = (globalThis as any).crypto;
+  if (cryptoObject?.randomUUID) return cryptoObject.randomUUID();
+  return `local-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function saveLocalMemory(title: string, recipe: string) {
+  const memory: MemoryRow = {
+    id: createLocalId(),
+    user_id: "local",
+    title,
+    recipe,
+    created_at: new Date().toISOString(),
+  };
+
+  const memories = [memory, ...readLocalMemories()];
+  return writeLocalMemories(memories);
+}
+
 export async function saveMemory(title: string, recipe: string) {
-  if (!supabase) {
-    return {
-      ok: false as const,
-      message: "Supabase is not configured. Add the two EXPO_PUBLIC_SUPABASE environment variables in Vercel.",
-    };
-  }
-
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
-
-  if (userError) {
-    return { ok: false as const, message: userError.message };
-  }
-
-  if (!user) {
-    return {
-      ok: false as const,
-      message: "Sign in before saving a memory.",
-    };
-  }
-
   const cleanTitle = title.trim();
   const cleanRecipe = recipe.trim();
 
@@ -42,66 +74,71 @@ export async function saveMemory(title: string, recipe: string) {
     };
   }
 
-  const { error } = await supabase.from("memories").insert({
-    user_id: user.id,
-    title: cleanTitle,
-    recipe: cleanRecipe,
-  });
+  if (supabase) {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-  if (error) {
-    return { ok: false as const, message: error.message };
+      if (user) {
+        const { error } = await supabase.from("memories").insert({
+          user_id: user.id,
+          title: cleanTitle,
+          recipe: cleanRecipe,
+        });
+
+        if (!error) {
+          return { ok: true as const, message: "Memory saved." };
+        }
+      }
+    } catch {
+      // Fall through to local storage so the MVP still works offline or unsigned-in.
+    }
   }
 
-  return { ok: true as const, message: "Memory saved." };
+  if (saveLocalMemory(cleanTitle, cleanRecipe)) {
+    return {
+      ok: true as const,
+      message: "Memory saved on this device.",
+    };
+  }
+
+  return {
+    ok: false as const,
+    message: "Unable to save this memory on this device.",
+  };
 }
 
 export async function loadMemories() {
-  if (!supabase) {
-    return {
-      ok: false as const,
-      message: "Supabase is not configured.",
-      memories: [] as MemoryRow[],
-    };
-  }
+  if (supabase) {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+      if (user) {
+        const { data, error } = await supabase
+          .from("memories")
+          .select("id,user_id,title,recipe,created_at")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false });
 
-  if (userError) {
-    return {
-      ok: false as const,
-      message: userError.message,
-      memories: [] as MemoryRow[],
-    };
-  }
-
-  if (!user) {
-    return {
-      ok: false as const,
-      message: "Sign in to see your saved memories.",
-      memories: [] as MemoryRow[],
-    };
-  }
-
-  const { data, error } = await supabase
-    .from("memories")
-    .select("id,user_id,title,recipe,created_at")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    return {
-      ok: false as const,
-      message: error.message,
-      memories: [] as MemoryRow[],
-    };
+        if (!error) {
+          return {
+            ok: true as const,
+            message: "",
+            memories: (data ?? []) as MemoryRow[],
+          };
+        }
+      }
+    } catch {
+      // Fall through to locally saved memories.
+    }
   }
 
   return {
     ok: true as const,
     message: "",
-    memories: (data ?? []) as MemoryRow[],
+    memories: readLocalMemories(),
   };
 }
