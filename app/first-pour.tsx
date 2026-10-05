@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { saveMemory } from "../lib/memories";
+import { saveMemory } from "../Lib/memories";
 
 const TITLE = "The Barchemy House Sour";
 const RECIPE =
