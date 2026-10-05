@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { loadMemories, type MemoryRow } from "../lib/memories";
+import { loadMemories, type MemoryRow } from "../Lib/memories";
 
 export default function Memory() {
   const [memories, setMemories] = useState<MemoryRow[]>([]);
