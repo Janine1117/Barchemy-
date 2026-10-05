@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { router } from "expo-router";
 import { StyleSheet, Text, TextInput, View, Pressable } from "react-native";
-import { supabase } from "../Supabase";
+import { supabase } from "../lib/supabase";
 
 export default function Auth() {
   const [email, setEmail] = useState("");
