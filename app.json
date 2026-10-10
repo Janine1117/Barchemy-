@@ -1,27 +1,15 @@
 
-
 {
-
   "expo": {
-
     "name": "Barchemy",
-
     "slug": "barchemy",
-
     "version": "1.0.0",
-
     "scheme": "barchemy",
-
     "plugins": ["expo-router"],
-
     "web": {
-
       "bundler": "metro",
-
       "output": "single"
-
     }
-
   }
-
 }
+
