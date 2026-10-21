@@ -1,5 +1,5 @@
 import { Link, usePathname } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const tabs = [
   { icon: "⌂", label: "Home", href: "/home" },
@@ -12,13 +12,15 @@ const tabs = [
 export default function BottomNav() {
   const path = usePathname();
   return (
-    <View style={s.nav} accessibilityRole="tablist">
+    <View style={s.nav}>
       {tabs.map((tab) => {
         const current = path === tab.href;
         return (
-          <Link key={tab.href} href={tab.href} accessibilityLabel={tab.label} style={[s.tab, current && s.active]}>
-            <Text style={[s.icon, current && s.activeText]}>{tab.icon}</Text>
-            <Text style={[s.label, current && s.activeText]}>{tab.label}</Text>
+          <Link key={tab.href} href={tab.href} asChild>
+            <Pressable accessibilityRole="button" accessibilityLabel={tab.label} style={[s.tab, current && s.active]}>
+              <Text style={[s.icon, current && s.activeText]}>{tab.icon}</Text>
+              <Text style={[s.label, current && s.activeText]}>{tab.label}</Text>
+            </Pressable>
           </Link>
         );
       })}
