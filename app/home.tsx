@@ -1,4 +1,5 @@
 import { Link } from "expo-router";
+import JBinkPortrait from "../components/JBinkPortrait";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Home() {
@@ -6,6 +7,7 @@ export default function Home() {
     <View style={s.container}>
       <Link href="/" style={s.welcomeLink}>← BARCHEMY WELCOME</Link>
       <Text style={s.eyebrow}>J.BINK'S BAR</Text>
+      <JBinkPortrait />
       <Text style={s.title}>Good to see you.</Text>
       <Text style={s.question}>What are we getting into today?</Text>
 
