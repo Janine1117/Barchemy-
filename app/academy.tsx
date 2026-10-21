@@ -35,8 +35,15 @@ const lessons = [
 export default function Academy() {
   const [active, setActive] = useState(0);
   const [answer, setAnswer] = useState<number | null>(null);
+  const [completed, setCompleted] = useState<number[]>([]);
   const lesson = lessons[active];
   const isCorrect = answer === lesson.correct;
+  const finished = completed.length === lessons.length;
+
+  function chooseAnswer(index: number) {
+    setAnswer(index);
+    if (index === lesson.correct) setCompleted(previous => previous.includes(active) ? previous : [...previous, active]);
+  }
 
   function selectLesson(index: number) {
     setActive(index);
@@ -49,10 +56,11 @@ export default function Academy() {
       <Text style={s.eyebrow}>BARCHEMY ACADEMY</Text>
       <Text style={s.title}>Learn the art of the pour.</Text>
       <Text style={s.intro}>Build confidence through quick, practical mixology lessons. No drink required to learn.</Text>
+      <Text style={s.progress} accessibilityRole="text">{finished ? "All three lessons completed!" : `${completed.length} of ${lessons.length} lessons completed`}</Text>
       <View style={s.lessonTabs}>
         {lessons.map((item, index) => (
           <Pressable key={item.title} accessibilityRole="button" onPress={() => selectLesson(index)} style={[s.tab,active===index&&s.activeTab]}>
-            <Text style={[s.tabText,active===index&&s.activeTabText]}>LESSON {index+1}</Text>
+            <Text style={[s.tabText,active===index&&s.activeTabText]}>{completed.includes(index) ? "✓ COMPLETED" : `LESSON ${index+1}`}</Text>
             <Text style={s.tabLabel}>{item.title}</Text>
           </Pressable>
         ))}
@@ -67,7 +75,7 @@ export default function Academy() {
         <Text style={s.eyebrow}>CHECK YOUR KNOWLEDGE</Text>
         <Text style={s.question}>{lesson.question}</Text>
         {lesson.answers.map((choice,index) => (
-          <Pressable key={choice} accessibilityRole="button" onPress={()=>setAnswer(index)} style={[s.answer, answer===index&&s.selectedAnswer]}>
+          <Pressable key={choice} accessibilityRole="button" onPress={()=>chooseAnswer(index)} style={[s.answer, answer===index&&s.selectedAnswer]}>
             <Text style={s.answerText}>{choice}</Text>
           </Pressable>
         ))}
@@ -89,6 +97,7 @@ const s=StyleSheet.create({
   eyebrow:{color:"#D6A84F",letterSpacing:2,fontSize:12,fontWeight:"700"},
   title:{color:"#F4E9D0",fontSize:30,fontWeight:"800",marginTop:12},
   intro:{color:"#BDB4BE",fontSize:16,lineHeight:24,marginTop:12},
+  progress:{color:"#D6A84F",fontWeight:"700",marginTop:18},
   lessonTabs:{gap:10,marginTop:24},
   tab:{backgroundColor:"#211A25",borderRadius:15,borderWidth:1,borderColor:"#51405A",padding:15},
   activeTab:{borderColor:"#D6A84F",backgroundColor:"#30251B"},
