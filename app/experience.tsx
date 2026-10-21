@@ -1,35 +1,130 @@
 import { useState } from "react";
 import { Link } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import JBinkPortrait from "../components/JBinkPortrait";
 
 const scenes = [
-  ["THE DOORS OPEN", "Step inside Barchemy", "A place where every pour becomes a story."],
-  ["MEET J.BINK", "Your AI bartender awaits", "J.Bink welcomes you, helps you choose a vibe, and suggests drinks."],
-  ["EXPLORE THE BAR", "Find your next cocktail", "Ask J.Bink for something fruity, bold, or unexpected."],
-  ["MY BAR", "Your ingredients. Your drinks.", "Keep track of your ingredients and explore what you can make."],
-  ["MEMORY WALL", "Make every moment count", "Save a cocktail moment and revisit it later."],
-  ["THE BAR AWAITS", "Ready to mix some magic?", "Continue into J.Bink's Bar."],
+  { eyebrow:"01 · THE ENTRANCE", title:"Step into the Barchemy experience.", copy:"Where every pour becomes a story." },
+  { eyebrow:"02 · MEET YOUR BARTENDER", title:"J.Bink is here to welcome you.", copy:"Your bartender helps you find the right drink for the moment." },
+  { eyebrow:"03 · DISCOVER", title:"Find a cocktail that fits.", copy:"From something fruity to a bold classic, explore your next first pour." },
+  { eyebrow:"04 · MY BAR", title:"Your bar, your ingredients.", copy:"Keep an eye on what's in your collection and discover what you can make." },
+  { eyebrow:"05 · THE MEMORY WALL", title:"Make it a memory.", copy:"Capture your favorite cocktail moments and revisit them whenever you like." },
+  { eyebrow:"06 · ENTER THE BAR", title:"J.Bink is ready when you are.", copy:"Your Barchemy experience is waiting on the other side." },
 ];
-const gold = "#D6A84F", cream = "#F4E9D0";
+const gold="#D6A84F", cream="#F4E9D0";
+
+function Shelf() {
+  return <View style={s.shelf}>
+    {[58,81,68,92,62,76,58].map((height,i)=>
+      <View key={i} style={[s.bottle,{height,backgroundColor:["#67472D","#927144","#603625","#A27332"][i%4]}]} />
+    )}
+  </View>;
+}
+function Stage({step}:{step:number}) {
+  if(step===0){
+    return <View style={s.stage}>
+      <Text style={s.star}>✦</Text>
+      <Text style={s.stageBrand}>BARCHEMY</Text>
+      <Text style={s.caption}>WELCOME TO YOUR NEW FAVORITE PLACE</Text>
+      <Shelf />
+      <Text style={s.stageCopy}>The doors are open. Let's make something special.</Text>
+    </View>;
+  }
+  if(step===1 || step===5){
+    return <View style={s.stage}>
+      <JBinkPortrait />
+      <Text style={s.stageBrand}>J.BINK</Text>
+      <Text style={s.caption}>YOUR BARTENDER</Text>
+      <View style={s.bubble}><Text style={s.bubbleText}>{step===1?"Welcome in! I'm J.Bink. What are we getting into tonight?":"The bar's ready for you. Let's create your first cocktail."}</Text></View>
+    </View>;
+  }
+  if(step===2){
+    return <View style={s.stage}>
+      <Text style={s.stageLabel}>ASK J.BINK</Text>
+      <Text style={s.previewTitle}>What are you in the mood for?</Text>
+      {["🍍  Something fruity", "🥃  Something bold", "✦  Use what I have", "🍸  Surprise me"].map(x=>
+        <View key={x} style={s.previewItem}><Text style={s.previewItemText}>{x}</Text></View>
+      )}
+    </View>;
+  }
+  if(step===3){
+    return <View style={s.stage}>
+      <Text style={s.stageLabel}>MY BAR</Text>
+      <Text style={s.previewTitle}>Your collection</Text>
+      <Text style={s.stageCopy}>A home for everything behind your bar.</Text>
+      {["Spirits", "Liqueurs & Syrups", "Mixers", "Garnishes"].map((x,i)=>
+        <View key={x} style={s.previewRow}>
+          <Text style={s.previewItemText}>{x}</Text><Text style={s.previewDim}>{["🥃","🍯","🍋","🌿"][i]}</Text>
+        </View>
+      )}
+    </View>;
+  }
+  return <View style={s.stage}>
+    <Text style={s.star}>♡</Text>
+    <Text style={s.stageLabel}>MEMORY WALL</Text>
+    <Text style={s.previewTitle}>Capture the magic.</Text>
+    <View style={s.memoryCard}>
+      <Text style={s.stageLabel}>THE BARCHEMY HOUSE SOUR</Text>
+      <Text style={s.stageCopy}>Bright · Balanced · Beginner-friendly</Text>
+      <Text style={s.previewDim}>Your saved cocktail moments live here.</Text>
+    </View>
+    <Text style={s.stageCopy}>Sip. Smile. Repeat. ✨</Text>
+  </View>;
+}
 export default function Experience() {
-  const [step, setStep] = useState(0);
-  const scene = scenes[step];
-  return <ScrollView style={{ backgroundColor:"#120F14" }} contentContainerStyle={{ padding:28, paddingTop:70, flexGrow:1, justifyContent:"center" }}>
-    <Text style={{ color:gold, letterSpacing:3 }}>BARCHEMY  ·  {step+1} / {scenes.length}</Text>
-    <Text style={{ color:cream, fontSize:30, fontWeight:"800", marginTop:20 }}>{scene[1]}</Text>
-    <Text style={{ color:"#BDB4BE", fontSize:16, lineHeight:25, marginTop:15 }}>{scene[2]}</Text>
-    <View style={{ backgroundColor:"#211A25", borderColor:"#634D30", borderWidth:1, padding:25, borderRadius:22, minHeight:260, justifyContent:"center", marginTop:28 }}>
-      <Text style={{ color:gold, letterSpacing:2, fontSize:14 }}>{scene[0]}</Text>
-      <Text style={{ color:cream, fontSize:26, marginTop:15 }}>{step===1 ? "J.BINK  ✦" : step===2 ? "ASK J.BINK  🍸" : step===3 ? "MY BAR  ✦" : step===4 ? "SIP. SMILE. REPEAT. ✨" : "WELCOME TO BARCHEMY"}</Text>
-      <Text style={{ color:"#BDB4BE", lineHeight:24, marginTop:16 }}>{step===1 ? "Hey there! What are we in the mood for today?" : step===2 ? "Something fruity   ·   Something bold   ·   Surprise me" : step===3 ? "Spirits   ·   Mixers   ·   Garnishes" : step===4 ? "Your favorite cocktail moments live here." : "Where every pour becomes a story."}</Text>
+  const [step,setStep]=useState(0);
+  const scene=scenes[step];
+  return <ScrollView style={s.page} contentContainerStyle={s.container}>
+    <View style={s.top}>
+      <Link href="/" style={s.brand}>BARCHEMY</Link>
+      <Text style={s.count}>{step+1} / {scenes.length}</Text>
     </View>
+    <View style={s.progress}>{scenes.map((_,i)=><View key={i} style={[s.segment,i<=step&&s.segmentOn]}/>)}</View>
+    <Text style={s.eyebrow}>{scene.eyebrow}</Text>
+    <Text style={s.title}>{scene.title}</Text>
+    <Text style={s.copy}>{scene.copy}</Text>
+    <Stage step={step} />
     {step===scenes.length-1
-      ? <Link href="/home" style={{ backgroundColor:gold, color:"#120F14", textAlign:"center", padding:18, marginTop:26, fontWeight:"800", borderRadius:14, overflow:"hidden" }}>ENTER J.BINK'S BAR</Link>
-      : <Pressable onPress={()=>setStep(step+1)} style={{ backgroundColor:gold, padding:18, marginTop:26, borderRadius:14 }}><Text style={{ color:"#120F14", textAlign:"center", fontWeight:"800" }}>CONTINUE  →</Text></Pressable>}
-    <View style={{ flexDirection:"row", justifyContent:"space-between", marginTop:24 }}>
-      {step>0 ? <Pressable onPress={()=>setStep(step-1)}><Text style={{ color:gold }}>← BACK</Text></Pressable> : <Link href="/" style={{color:gold}}>← WELCOME</Link>}
-      <Link href="/home" style={{color:gold}}>SKIP INTRO</Link>
+      ? <Link href="/home" style={s.button}>ENTER J.BINK'S BAR</Link>
+      : <Pressable accessibilityRole="button" style={s.button} onPress={()=>setStep(step+1)}><Text style={s.buttonText}>CONTINUE  →</Text></Pressable>}
+    <View style={s.footer}>
+      {step>0?<Pressable accessibilityRole="button" onPress={()=>setStep(step-1)}><Text style={s.footerLink}>← PREVIOUS</Text></Pressable>:<Link href="/" style={s.footerLink}>← WELCOME</Link>}
+      <Link href="/home" style={s.footerLink}>SKIP TO BAR</Link>
     </View>
-    <Text style={{ color:"#BDB4BE", textAlign:"center", marginTop:30 }}>Sip. Smile. Repeat. ✨</Text>
+    <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
   </ScrollView>;
 }
+const s=StyleSheet.create({
+  page:{flex:1,backgroundColor:"#120F14"},
+  container:{flexGrow:1,padding:24,paddingTop:46,paddingBottom:44},
+  top:{flexDirection:"row",justifyContent:"space-between",alignItems:"center"},
+  brand:{color:gold,letterSpacing:3,fontWeight:"800",fontSize:20},
+  count:{color:"#BDB4BE",fontSize:13},
+  progress:{flexDirection:"row",gap:5,marginTop:23,marginBottom:28},
+  segment:{height:4,backgroundColor:"#433346",flex:1,borderRadius:4},
+  segmentOn:{backgroundColor:gold},
+  eyebrow:{fontSize:12,letterSpacing:2,color:gold,fontWeight:"700"},
+  title:{fontSize:29,lineHeight:37,color:cream,fontWeight:"800",marginTop:12},
+  copy:{fontSize:16,lineHeight:23,color:"#BDB4BE",marginTop:12,marginBottom:22},
+  stage:{backgroundColor:"#211A25",borderColor:"#5B412E",borderWidth:1,borderRadius:24,padding:22,alignItems:"center",minHeight:300,justifyContent:"center"},
+  star:{fontSize:37,color:gold,marginBottom:10},
+  stageBrand:{fontSize:25,color:gold,fontWeight:"800",letterSpacing:3,marginTop:12},
+  caption:{fontSize:10,color:"#BDB4BE",letterSpacing:1.5,textAlign:"center",marginTop:8},
+  stageCopy:{fontSize:14,color:cream,lineHeight:21,textAlign:"center",marginTop:16},
+  shelf:{height:110,width:"100%",borderBottomWidth:6,borderColor:"#795332",flexDirection:"row",alignItems:"flex-end",justifyContent:"space-around",marginTop:28},
+  bottle:{width:22,borderTopLeftRadius:8,borderTopRightRadius:8,opacity:.88},
+  bubble:{backgroundColor:"#302631",borderRadius:15,padding:17,marginTop:18,width:"100%"},
+  bubbleText:{fontSize:16,lineHeight:23,color:cream},
+  stageLabel:{color:gold,fontSize:12,letterSpacing:2,fontWeight:"700",textAlign:"center"},
+  previewTitle:{color:cream,fontSize:23,fontWeight:"700",textAlign:"center",marginTop:15,marginBottom:12},
+  previewItem:{backgroundColor:"#302631",padding:14,marginTop:9,borderRadius:12,width:"100%"},
+  previewItemText:{fontSize:16,color:cream},
+  previewRow:{flexDirection:"row",justifyContent:"space-between",width:"100%",paddingVertical:16,borderBottomWidth:1,borderColor:"#58445B"},
+  previewDim:{color:"#BDB4BE",fontSize:13,marginTop:8},
+  memoryCard:{backgroundColor:"#302631",borderRadius:15,padding:20,marginTop:17,alignItems:"center",width:"100%"},
+  button:{backgroundColor:gold,color:"#120F14",textAlign:"center",padding:18,fontWeight:"800",borderRadius:14,overflow:"hidden",marginTop:23},
+  buttonText:{color:"#120F14",textAlign:"center",fontWeight:"800"},
+  footer:{flexDirection:"row",justifyContent:"space-between",marginTop:24,gap:12},
+  footerLink:{color:gold,fontWeight:"700",fontSize:12},
+  toast:{color:"#BDB4BE",textAlign:"center",marginTop:30}
+});
