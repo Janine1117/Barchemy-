@@ -89,7 +89,7 @@ export default function Experience() {
       : <Pressable accessibilityRole="button" style={s.button} onPress={()=>setStep(step+1)}><Text style={s.buttonText}>CONTINUE  →</Text></Pressable>}
     <View style={s.footer}>
       {step>0?<Pressable accessibilityRole="button" onPress={()=>setStep(step-1)}><Text style={s.footerLink}>← PREVIOUS</Text></Pressable>:<Link href="/" style={s.footerLink}>← WELCOME</Link>}
-      <Link href="/home" style={s.footerLink}>SKIP TO BAR</Link>
+      <Text style={s.footerLink}>SCENE {step+1} OF {scenes.length}</Text>
     </View>
     <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
   </ScrollView>;
