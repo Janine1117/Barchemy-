@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 export default function Home() {
   return (
     <View style={s.container}>
+      <Link href="/" style={s.welcomeLink}>← BARCHEMY WELCOME</Link>
       <Text style={s.eyebrow}>J.BINK'S BAR</Text>
       <Text style={s.title}>Good to see you.</Text>
       <Text style={s.question}>What are we getting into today?</Text>
@@ -44,6 +45,7 @@ export default function Home() {
 const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#120F14", padding: 28, paddingTop: 70 },
   eyebrow: { color: "#D6A84F", letterSpacing: 2 },
+  welcomeLink: { color: "#D6A84F", fontWeight: "700", marginBottom: 25 },
   title: { color: "#F4E9D0", fontSize: 30, fontWeight: "700", marginTop: 10 },
   question: { color: "#BDB4BE", fontSize: 17, marginTop: 8 },
   card: { backgroundColor: "#211A25", padding: 22, borderRadius: 20, marginTop: 28 },
