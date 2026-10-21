@@ -3,128 +3,125 @@ import { Link } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import JBinkPortrait from "../components/JBinkPortrait";
 
-const scenes = [
-  { eyebrow:"01 · THE ENTRANCE", title:"Step into the Barchemy experience.", copy:"Where every pour becomes a story." },
-  { eyebrow:"02 · MEET YOUR BARTENDER", title:"J.Bink is here to welcome you.", copy:"Your bartender helps you find the right drink for the moment." },
-  { eyebrow:"03 · DISCOVER", title:"Find a cocktail that fits.", copy:"From something fruity to a bold classic, explore your next first pour." },
-  { eyebrow:"04 · MY BAR", title:"Your bar, your ingredients.", copy:"Keep an eye on what's in your collection and discover what you can make." },
-  { eyebrow:"05 · THE MEMORY WALL", title:"Make it a memory.", copy:"Capture your favorite cocktail moments and revisit them whenever you like." },
-  { eyebrow:"06 · ENTER THE BAR", title:"J.Bink is ready when you are.", copy:"Your Barchemy experience is waiting on the other side." },
-];
-const gold="#D6A84F", cream="#F4E9D0";
+const seasons = [
+  { name: "Autumn", icon: "🍂", accent: "#B67A45", title: "A warm welcome", detail: "Spiced citrus, apple, and cozy gathering inspiration.", suggestion: "Try a warming apple-and-cinnamon flavor direction." },
+  { name: "Winter", icon: "❄️", accent: "#91BDD0", title: "A little winter sparkle", detail: "Crisp citrus, cranberry, and refreshing winter colors.", suggestion: "Explore cranberry and rosemary in a zero-proof spritz." },
+  { name: "Summer", icon: "☀️", accent: "#E4B955", title: "Bright days, fresh flavors", detail: "Berries, pineapple, and garden-fresh herbs.", suggestion: "Explore a bright pineapple-and-mint combination." },
+  { name: "Halloween", icon: "🎃", accent: "#D78A43", title: "A playful after-dark mood", detail: "Deep berry colors, spice, and a little theatrical flair.", suggestion: "Try a blackberry-and-lime mocktail idea." },
+  { name: "Christmas", icon: "✨", accent: "#A8C7A5", title: "A festive gathering", detail: "Pomegranate, orange, rosemary, and celebratory sparkle.", suggestion: "Explore a pomegranate-and-orange holiday punch." }
+] as const;
 
-function Shelf() {
-  return <View style={s.shelf}>
-    {[58,81,68,92,62,76,58].map((height,i)=>
-      <View key={i} style={[s.bottle,{height,backgroundColor:["#67472D","#927144","#603625","#A27332"][i%4]}]} />
-    )}
-  </View>;
-}
-function Stage({step}:{step:number}) {
-  if(step===0){
-    return <View style={s.stage}>
-      <Text style={s.star}>✦</Text>
-      <Text style={s.stageBrand}>BARCHEMY</Text>
-      <Text style={s.caption}>WELCOME TO YOUR NEW FAVORITE PLACE</Text>
-      <Shelf />
-      <Text style={s.stageCopy}>The doors are open. Let's make something special.</Text>
-    </View>;
-  }
-  if(step===1 || step===5){
-    return <View style={s.stage}>
-      <JBinkPortrait />
-      <Text style={s.stageBrand}>J.BINK</Text>
-      <Text style={s.caption}>YOUR BARTENDER</Text>
-      <View style={s.bubble}><Text style={s.bubbleText}>{step===1?"Welcome in! I'm J.Bink. What are we getting into tonight?":"The bar's ready for you. Let's create your first cocktail."}</Text></View>
-    </View>;
-  }
-  if(step===2){
-    return <View style={s.stage}>
-      <Text style={s.stageLabel}>ASK J.BINK</Text>
-      <Text style={s.previewTitle}>What are you in the mood for?</Text>
-      {["🍍  Something fruity", "🥃  Something bold", "✦  Use what I have", "🍸  Surprise me"].map(x=>
-        <View key={x} style={s.previewItem}><Text style={s.previewItemText}>{x}</Text></View>
-      )}
-    </View>;
-  }
-  if(step===3){
-    return <View style={s.stage}>
-      <Text style={s.stageLabel}>MY BAR</Text>
-      <Text style={s.previewTitle}>Your collection</Text>
-      <Text style={s.stageCopy}>A home for everything behind your bar.</Text>
-      {["Spirits", "Liqueurs & Syrups", "Mixers", "Garnishes"].map((x,i)=>
-        <View key={x} style={s.previewRow}>
-          <Text style={s.previewItemText}>{x}</Text><Text style={s.previewDim}>{["🥃","🍯","🍋","🌿"][i]}</Text>
-        </View>
-      )}
-    </View>;
-  }
-  return <View style={s.stage}>
-    <Text style={s.star}>♡</Text>
-    <Text style={s.stageLabel}>MEMORY WALL</Text>
-    <Text style={s.previewTitle}>Capture the magic.</Text>
-    <View style={s.memoryCard}>
-      <Text style={s.stageLabel}>THE BARCHEMY HOUSE SOUR</Text>
-      <Text style={s.stageCopy}>Bright · Balanced · Beginner-friendly</Text>
-      <Text style={s.previewDim}>Your saved cocktail moments live here.</Text>
-    </View>
-    <Text style={s.stageCopy}>Sip. Smile. Repeat. ✨</Text>
-  </View>;
-}
 export default function Experience() {
-  const [step,setStep]=useState(0);
-  const scene=scenes[step];
-  return <ScrollView style={s.page} contentContainerStyle={s.container}>
-    <View style={s.top}>
-      <Link href="/" style={s.brand}>BARCHEMY</Link>
-      <Text style={s.count}>{step+1} / {scenes.length}</Text>
-    </View>
-    <View style={s.progress}>{scenes.map((_,i)=><View key={i} style={[s.segment,i<=step&&s.segmentOn]}/>)}</View>
-    <Text style={s.eyebrow}>{scene.eyebrow}</Text>
-    <Text style={s.title}>{scene.title}</Text>
-    <Text style={s.copy}>{scene.copy}</Text>
-    <Stage step={step} />
-    {step===scenes.length-1
-      ? <Link href="/home" style={s.button}>ENTER J.BINK'S BAR</Link>
-      : <Pressable accessibilityRole="button" style={s.button} onPress={()=>setStep(step+1)}><Text style={s.buttonText}>CONTINUE  →</Text></Pressable>}
-    <View style={s.footer}>
-      {step>0?<Pressable accessibilityRole="button" onPress={()=>setStep(step-1)}><Text style={s.footerLink}>← PREVIOUS</Text></Pressable>:<Link href="/" style={s.footerLink}>← WELCOME</Link>}
-      <Text style={s.footerLink}>SCENE {step+1} OF {scenes.length}</Text>
-    </View>
-    <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
-  </ScrollView>;
+  const [seasonIndex, setSeasonIndex] = useState(0);
+  const season = seasons[seasonIndex];
+  return (
+    <ScrollView style={s.page} contentContainerStyle={s.content}>
+      <View style={s.brandRow}>
+        <Text style={s.brand}>BARCHEMY</Text>
+        <Link href="/" style={s.back}>← WELCOME</Link>
+      </View>
+      <Text style={s.eyebrow}>THE BARCHEMY EXPERIENCE</Text>
+      <Text style={s.title}>Where every pour becomes a story.</Text>
+      <Text style={s.intro}>Welcome to a world of discovery, creativity, and memorable moments. J.Bink's Bar is just one destination.</Text>
+
+      <View style={s.hero}>
+        <JBinkPortrait />
+        <Text style={s.heroName}>MEET J.BINK</Text>
+        <Text style={s.heroText}>Your AI bartender is ready to help you explore, learn, and make something special.</Text>
+        <Link href="/home" style={s.primary}>ENTER J.BINK'S BAR →</Link>
+        <Link href="/bar-tour" style={s.secondary}>EXPLORE THE SIX BAR SCENES</Link>
+      </View>
+
+      <Text style={s.section}>EXPLORE BARCHEMY</Text>
+      <View style={s.card}>
+        <Text style={s.cardIcon}>🎓</Text>
+        <Text style={s.cardTitle}>BARCHEMY ACADEMY</Text>
+        <Text style={s.cardBody}>Learn cocktail tools, mixing techniques, and flavor balance with interactive lessons and quizzes.</Text>
+        <Link href="/academy" style={s.cardLink}>START LEARNING →</Link>
+      </View>
+      <View style={s.card}>
+        <Text style={s.cardIcon}>✦</Text>
+        <Text style={s.cardTitle}>CREATE & REMEMBER</Text>
+        <Text style={s.cardBody}>Find a drink, mix it step by step, keep track of ingredients, and save your favorite moments.</Text>
+        <View style={s.links}>
+          <Link href="/ask" style={s.miniLink}>ASK J.BINK</Link>
+          <Link href="/first-pour" style={s.miniLink}>FIRST POUR</Link>
+          <Link href="/my-bar" style={s.miniLink}>MY BAR</Link>
+          <Link href="/memory" style={s.miniLink}>MEMORIES</Link>
+        </View>
+      </View>
+
+      <Text style={s.section}>SEASONAL INSPIRATION</Text>
+      <Text style={s.description}>Choose a mood to preview the colors and flavors planned for Barchemy's changing seasonal environments.</Text>
+      <View style={s.seasonRow}>
+        {seasons.map((item, index) => (
+          <Pressable key={item.name} accessibilityRole="button" accessibilityState={{ selected: seasonIndex === index }} onPress={() => setSeasonIndex(index)} style={[s.seasonChoice,seasonIndex===index && {borderColor:item.accent,backgroundColor:"#332A31"}]}>
+            <Text style={s.seasonIcon}>{item.icon}</Text>
+            <Text style={s.seasonText}>{item.name}</Text>
+          </Pressable>
+        ))}
+      </View>
+      <View style={[s.seasonPreview,{borderColor:season.accent}]}>
+        <Text style={s.seasonEyebrow}>SEASONAL MOOD PREVIEW · {season.name.toUpperCase()}</Text>
+        <Text style={s.seasonHeadline}>{season.title}</Text>
+        <Text style={s.seasonBody}>{season.detail}</Text>
+        <Text style={s.seasonHint}>{season.suggestion}</Text>
+        <Text style={s.previewNote}>Visual environments and themed recipe collections are still in development.</Text>
+      </View>
+
+      <Text style={s.section}>MORE OF THE BARCHEMY WORLD</Text>
+      <View style={s.planned}>
+        <Text style={s.plannedTitle}>PARTY PLANNER  ·  COMING SOON</Text>
+        <Text style={s.plannedBody}>Menus, shopping, preparation, and memorable gatherings.</Text>
+      </View>
+      <View style={s.planned}>
+        <Text style={s.plannedTitle}>BARCHEMY SOCIETY  ·  COMING SOON</Text>
+        <Text style={s.plannedBody}>Discover creations and connect with a creative community.</Text>
+      </View>
+      <View style={s.planned}>
+        <Text style={s.plannedTitle}>BARCHEMY MAGIC  ·  COMING SOON</Text>
+        <Text style={s.plannedBody}>Explore flavor challenges, seasonal events, and discovery.</Text>
+      </View>
+      <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
+    </ScrollView>
+  );
 }
-const s=StyleSheet.create({
+
+const s = StyleSheet.create({
   page:{flex:1,backgroundColor:"#120F14"},
-  container:{flexGrow:1,padding:24,paddingTop:46,paddingBottom:44},
-  top:{flexDirection:"row",justifyContent:"space-between",alignItems:"center"},
-  brand:{color:gold,letterSpacing:3,fontWeight:"800",fontSize:20},
-  count:{color:"#BDB4BE",fontSize:13},
-  progress:{flexDirection:"row",gap:5,marginTop:23,marginBottom:28},
-  segment:{height:4,backgroundColor:"#433346",flex:1,borderRadius:4},
-  segmentOn:{backgroundColor:gold},
-  eyebrow:{fontSize:12,letterSpacing:2,color:gold,fontWeight:"700"},
-  title:{fontSize:29,lineHeight:37,color:cream,fontWeight:"800",marginTop:12},
-  copy:{fontSize:16,lineHeight:23,color:"#BDB4BE",marginTop:12,marginBottom:22},
-  stage:{backgroundColor:"#211A25",borderColor:"#5B412E",borderWidth:1,borderRadius:24,padding:22,alignItems:"center",minHeight:300,justifyContent:"center"},
-  star:{fontSize:37,color:gold,marginBottom:10},
-  stageBrand:{fontSize:25,color:gold,fontWeight:"800",letterSpacing:3,marginTop:12},
-  caption:{fontSize:10,color:"#BDB4BE",letterSpacing:1.5,textAlign:"center",marginTop:8},
-  stageCopy:{fontSize:14,color:cream,lineHeight:21,textAlign:"center",marginTop:16},
-  shelf:{height:110,width:"100%",borderBottomWidth:6,borderColor:"#795332",flexDirection:"row",alignItems:"flex-end",justifyContent:"space-around",marginTop:28},
-  bottle:{width:22,borderTopLeftRadius:8,borderTopRightRadius:8,opacity:.88},
-  bubble:{backgroundColor:"#302631",borderRadius:15,padding:17,marginTop:18,width:"100%"},
-  bubbleText:{fontSize:16,lineHeight:23,color:cream},
-  stageLabel:{color:gold,fontSize:12,letterSpacing:2,fontWeight:"700",textAlign:"center"},
-  previewTitle:{color:cream,fontSize:23,fontWeight:"700",textAlign:"center",marginTop:15,marginBottom:12},
-  previewItem:{backgroundColor:"#302631",padding:14,marginTop:9,borderRadius:12,width:"100%"},
-  previewItemText:{fontSize:16,color:cream},
-  previewRow:{flexDirection:"row",justifyContent:"space-between",width:"100%",paddingVertical:16,borderBottomWidth:1,borderColor:"#58445B"},
-  previewDim:{color:"#BDB4BE",fontSize:13,marginTop:8},
-  memoryCard:{backgroundColor:"#302631",borderRadius:15,padding:20,marginTop:17,alignItems:"center",width:"100%"},
-  button:{backgroundColor:gold,color:"#120F14",textAlign:"center",padding:18,fontWeight:"800",borderRadius:14,overflow:"hidden",marginTop:23},
-  buttonText:{color:"#120F14",textAlign:"center",fontWeight:"800"},
-  footer:{flexDirection:"row",justifyContent:"space-between",marginTop:24,gap:12},
-  footerLink:{color:gold,fontWeight:"700",fontSize:12},
-  toast:{color:"#BDB4BE",textAlign:"center",marginTop:30}
+  content:{flexGrow:1,padding:22,paddingTop:47,paddingBottom:52},
+  brandRow:{flexDirection:"row",justifyContent:"space-between",alignItems:"center"},
+  brand:{color:"#D6A84F",fontWeight:"800",letterSpacing:3,fontSize:21},
+  back:{color:"#D6A84F",fontWeight:"700",fontSize:12},
+  eyebrow:{color:"#D6A84F",letterSpacing:2,fontSize:12,fontWeight:"700",marginTop:32},
+  title:{color:"#F4E9D0",fontWeight:"800",fontSize:31,lineHeight:39,marginTop:12},
+  intro:{color:"#BDB4BE",fontSize:16,lineHeight:24,marginTop:14,marginBottom:23},
+  hero:{backgroundColor:"#211A25",borderColor:"#785D3A",borderWidth:1,borderRadius:22,padding:20,alignItems:"center"},
+  heroName:{color:"#D6A84F",fontWeight:"800",letterSpacing:2,fontSize:19,marginTop:17},
+  heroText:{color:"#F4E9D0",fontSize:15,lineHeight:23,textAlign:"center",marginTop:9},
+  primary:{backgroundColor:"#D6A84F",color:"#120F14",fontWeight:"800",textAlign:"center",padding:17,borderRadius:13,overflow:"hidden",width:"100%",marginTop:20},
+  secondary:{color:"#D6A84F",fontWeight:"700",marginTop:18,textAlign:"center"},
+  section:{color:"#D6A84F",fontSize:12,letterSpacing:2,fontWeight:"800",marginTop:33,marginBottom:12},
+  card:{backgroundColor:"#211A25",borderRadius:18,padding:20,marginTop:11,borderColor:"#4B3B50",borderWidth:1},
+  cardIcon:{fontSize:24},
+  cardTitle:{color:"#F4E9D0",fontWeight:"800",letterSpacing:1,fontSize:16,marginTop:12},
+  cardBody:{color:"#BDB4BE",lineHeight:22,marginTop:8},
+  cardLink:{color:"#D6A84F",fontWeight:"800",marginTop:17},
+  links:{flexDirection:"row",flexWrap:"wrap",gap:9,marginTop:17},
+  miniLink:{color:"#D6A84F",borderWidth:1,borderColor:"#765B3B",borderRadius:11,overflow:"hidden",paddingHorizontal:13,paddingVertical:12,fontSize:12,fontWeight:"700"},
+  description:{color:"#BDB4BE",lineHeight:22,marginBottom:14},
+  seasonRow:{flexDirection:"row",flexWrap:"wrap",gap:9},
+  seasonChoice:{backgroundColor:"#211A25",borderColor:"#4B3B50",borderWidth:1,borderRadius:13,paddingVertical:12,paddingHorizontal:13,alignItems:"center",minWidth:92},
+  seasonIcon:{fontSize:22},
+  seasonText:{color:"#F4E9D0",fontWeight:"700",fontSize:12,marginTop:7},
+  seasonPreview:{backgroundColor:"#211A25",borderRadius:18,borderWidth:2,padding:21,marginTop:16},
+  seasonEyebrow:{color:"#D6A84F",letterSpacing:1.4,fontSize:11,fontWeight:"800"},
+  seasonHeadline:{color:"#F4E9D0",fontWeight:"800",fontSize:24,marginTop:13},
+  seasonBody:{color:"#F4E9D0",lineHeight:23,marginTop:12},
+  seasonHint:{color:"#D6A84F",lineHeight:22,marginTop:13},
+  previewNote:{color:"#BDB4BE",fontSize:12,lineHeight:18,marginTop:16,fontStyle:"italic"},
+  planned:{borderBottomWidth:1,borderBottomColor:"#453747",paddingVertical:17},
+  plannedTitle:{color:"#F4E9D0",fontWeight:"800",fontSize:13,letterSpacing:.6},
+  plannedBody:{color:"#BDB4BE",lineHeight:21,marginTop:7},
+  toast:{color:"#D6A84F",textAlign:"center",marginTop:31}
 });
