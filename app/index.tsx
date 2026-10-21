@@ -48,7 +48,7 @@ export default function Welcome() {
         ))}
       </View>
       {step === scenes.length - 1 ? (
-        <Link href="/home" style={s.button}>ENTER J.BINK'S BAR</Link>
+        <Link href="/experience" style={s.button}>ENTER J.BINK'S BAR</Link>
       ) : (
         <Pressable accessibilityRole="button" style={s.button} onPress={() => setStep(step + 1)}>
           <Text style={s.buttonText}>CONTINUE</Text>
