@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { loadMemories, type MemoryRow } from "../Lib/memories";
+import BottomNav from "../components/BottomNav";
 
 export default function Memory() {
   const [memories, setMemories] = useState<MemoryRow[]>([]);
@@ -57,7 +58,8 @@ export default function Memory() {
         <Text style={s.refreshText}>{loading ? "LOADING…" : "REFRESH MEMORIES"}</Text>
       </Pressable>
 
-      <Text style={s.toast}>Sip. Smile. Repeat.</Text>
+      <BottomNav />
+      <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
     </ScrollView>
   );
 }
