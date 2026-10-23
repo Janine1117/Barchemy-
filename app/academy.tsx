@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+const PROGRESS_KEY = "barchemy.academy.completed.v1";
 const lessons = [
   {
     title: "Tools of the Trade",
@@ -36,6 +37,19 @@ export default function Academy() {
   const [active, setActive] = useState(0);
   const [answer, setAnswer] = useState<number | null>(null);
   const [completed, setCompleted] = useState<number[]>([]);
+  const [ready,setReady]=useState(false);
+  useEffect(()=>{
+    try {
+      const raw=(globalThis as any).localStorage?.getItem(PROGRESS_KEY);
+      const parsed=raw?JSON.parse(raw):[];
+      if(Array.isArray(parsed)) setCompleted(parsed.filter((n):n is number=>Number.isInteger(n)&&n>=0&&n<lessons.length));
+    } catch {}
+    setReady(true);
+  },[]);
+  useEffect(()=>{
+    if(!ready)return;
+    try {(globalThis as any).localStorage?.setItem(PROGRESS_KEY,JSON.stringify(completed));}catch {}
+  },[completed,ready]);
   const lesson = lessons[active];
   const isCorrect = answer === lesson.correct;
   const finished = completed.length === lessons.length;
@@ -57,6 +71,7 @@ export default function Academy() {
       <Text style={s.title}>Learn the art of the pour.</Text>
       <Text style={s.intro}>Build confidence through quick, practical mixology lessons. No drink required to learn.</Text>
       <Text style={s.progress} accessibilityRole="text">{finished ? "All three lessons completed!" : `${completed.length} of ${lessons.length} lessons completed`}</Text>
+      <Text style={s.intro}>Correct answers save your lesson progress on this device, including after refreshing the page.</Text>
       <View style={s.lessonTabs}>
         {lessons.map((item, index) => (
           <Pressable key={item.title} accessibilityRole="button" onPress={() => selectLesson(index)} style={[s.tab,active===index&&s.activeTab]}>
@@ -86,7 +101,7 @@ export default function Academy() {
       <Pressable accessibilityRole="button" onPress={()=>selectLesson((active+1)%lessons.length)} style={s.next}>
         <Text style={s.nextText}>{active===lessons.length-1 ? "RESTART ACADEMY LESSONS" : "NEXT LESSON →"}</Text>
       </Pressable>
-      <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
+
     </ScrollView>
   );
 }
