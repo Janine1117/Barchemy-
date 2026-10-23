@@ -28,7 +28,7 @@ export default function Experience() {
         <JBinkPortrait />
         <Text style={s.heroName}>MEET J.BINK</Text>
         <Text style={s.heroText}>Your AI bartender is ready to help you explore, learn, and make something special.</Text>
-        <Link href="/home" style={s.primary}>ENTER J.BINK'S BAR →</Link>
+        <Link href="/bar-tour" style={s.primary}>ENTER J.BINK'S BAR →</Link>
         <Link href="/bar-tour" style={s.secondary}>EXPLORE THE SIX BAR SCENES</Link>
       </View>
 
