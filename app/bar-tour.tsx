@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import JBinkPortrait from "../components/JBinkPortrait";
+import SeasonSelector, { useAtmosphere } from "../components/SeasonSelector";
 
 const scenes = [
   { eyebrow:"01 · THE ENTRANCE", title:"Step into the Barchemy experience.", copy:"Where every pour becomes a story." },
@@ -74,16 +75,19 @@ function Stage({step}:{step:number}) {
 export default function Experience() {
   const [step,setStep]=useState(0);
   const scene=scenes[step];
+  const {theme}=useAtmosphere();
   return <ScrollView style={s.page} contentContainerStyle={s.container}>
     <View style={s.top}>
       <Link href="/home" style={s.brand}>BARCHEMY</Link>
       <Text style={s.count}>{step+1} / {scenes.length}</Text>
     </View>
+    <Text style={{color:theme.color,marginTop:15,fontWeight:"700"}}>{theme.icon} {theme.name.toUpperCase()} BAR ATMOSPHERE</Text>
     <View style={s.progress}>{scenes.map((_,i)=><View key={i} style={[s.segment,i<=step&&s.segmentOn]}/>)}</View>
     <Text style={s.eyebrow}>{scene.eyebrow}</Text>
     <Text style={s.title}>{scene.title}</Text>
     <Text style={s.copy}>{scene.copy}</Text>
-    <Stage step={step} />
+    <View style={{backgroundColor:theme.background,borderColor:theme.color,borderWidth:2,borderRadius:24}}><Stage step={step} /></View>
+    <SeasonSelector />
     {step===scenes.length-1
       ? <View style={s.finalActions}><Link href="/home" style={s.button}>START MIXING →</Link><Link href="/experience" style={s.secondaryButton}>EXPLORE BARCHEMY →</Link></View>
       : <Pressable accessibilityRole="button" style={s.button} onPress={()=>setStep(step+1)}><Text style={s.buttonText}>CONTINUE  →</Text></Pressable>}
