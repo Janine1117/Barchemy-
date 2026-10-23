@@ -3,6 +3,7 @@ import { Link } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import JBinkPortrait from "../components/JBinkPortrait";
 import BottomNav from "../components/BottomNav";
+import SeasonSelector, { useAtmosphere } from "../components/SeasonSelector";
 
 const greetings = {
   Classic: "Welcome to my bar. Tell me what sounds good, and we'll find your next favorite cocktail.",
@@ -15,6 +16,7 @@ const vibes: Vibe[] = ["Classic", "Funny", "Coach", "Host"];
 
 export default function Home() {
   const [vibe, setVibe] = useState<Vibe>("Classic");
+  const {theme}=useAtmosphere();
   return (
     <ScrollView style={s.page} contentContainerStyle={s.container}>
       <View style={s.brandRow}>
@@ -23,10 +25,10 @@ export default function Home() {
       </View>
       <Text style={s.eyebrow}>THE BARCHEMY EXPERIENCE</Text>
       <Text style={s.heading}>Welcome to J.Bink's Bar.</Text>
-      <View style={s.hero}>
+      <View style={[s.hero,{backgroundColor:theme.background,borderColor:theme.color}]}>
         <View style={s.portrait}><JBinkPortrait /></View>
         <Text style={s.heroName}>J.BINK</Text>
-        <Text style={s.heroRole}>YOUR BARTENDER</Text>
+        <Text style={s.heroRole}>YOUR BARTENDER · {theme.icon} {theme.name.toUpperCase()}</Text>
         <View style={s.bubble}>
           <Text style={s.bubbleText}>{greetings[vibe]}</Text>
         </View>
