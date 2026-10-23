@@ -9,7 +9,7 @@ const scenes = [
   { eyebrow:"03 · DISCOVER", title:"Find a cocktail that fits.", copy:"From something fruity to a bold classic, explore your next first pour." },
   { eyebrow:"04 · MY BAR", title:"Your bar, your ingredients.", copy:"Keep an eye on what's in your collection and discover what you can make." },
   { eyebrow:"05 · THE MEMORY WALL", title:"Make it a memory.", copy:"Capture your favorite cocktail moments and revisit them whenever you like." },
-  { eyebrow:"06 · ENTER THE BAR", title:"J.Bink is ready when you are.", copy:"Your Barchemy experience is waiting on the other side." },
+  { eyebrow:"06 · YOUR FIRST POUR AWAITS", title:"Your first pour awaits.", copy:"Start mixing with J.Bink, or explore the rest of Barchemy." },
 ];
 const gold="#D6A84F", cream="#F4E9D0";
 
@@ -35,7 +35,7 @@ function Stage({step}:{step:number}) {
       <JBinkPortrait />
       <Text style={s.stageBrand}>J.BINK</Text>
       <Text style={s.caption}>YOUR BARTENDER</Text>
-      <View style={s.bubble}><Text style={s.bubbleText}>{step===1?"Welcome in! I'm J.Bink. What are we getting into tonight?":"The bar's ready for you. Let's create your first cocktail."}</Text></View>
+      <View style={s.bubble}><Text style={s.bubbleText}>{step===1?"Welcome in! I'm J.Bink. What are we getting into tonight?":"Ready to mix? I’ll be right here when you are."}</Text></View>
     </View>;
   }
   if(step===2){
@@ -85,7 +85,7 @@ export default function Experience() {
     <Text style={s.copy}>{scene.copy}</Text>
     <Stage step={step} />
     {step===scenes.length-1
-      ? <Link href="/home" style={s.button}>RETURN TO J.BINK'S BAR</Link>
+      ? <View style={s.finalActions}><Link href="/home" style={s.button}>START MIXING →</Link><Link href="/experience" style={s.secondaryButton}>EXPLORE BARCHEMY →</Link></View>
       : <Pressable accessibilityRole="button" style={s.button} onPress={()=>setStep(step+1)}><Text style={s.buttonText}>CONTINUE  →</Text></Pressable>}
     <View style={s.footer}>
       {step>0?<Pressable accessibilityRole="button" onPress={()=>setStep(step-1)}><Text style={s.footerLink}>← PREVIOUS</Text></Pressable>:<Link href="/home" style={s.footerLink}>← THE BAR</Link>}
@@ -124,6 +124,8 @@ const s=StyleSheet.create({
   memoryCard:{backgroundColor:"#302631",borderRadius:15,padding:20,marginTop:17,alignItems:"center",width:"100%"},
   button:{backgroundColor:gold,color:"#120F14",textAlign:"center",padding:18,fontWeight:"800",borderRadius:14,overflow:"hidden",marginTop:23},
   buttonText:{color:"#120F14",textAlign:"center",fontWeight:"800"},
+  finalActions:{gap:12,marginTop:23},
+  secondaryButton:{borderWidth:1,borderColor:gold,color:gold,textAlign:"center",padding:17,fontWeight:"800",borderRadius:14,overflow:"hidden"},
   footer:{flexDirection:"row",justifyContent:"space-between",marginTop:24,gap:12},
   footerLink:{color:gold,fontWeight:"700",fontSize:12},
   toast:{color:"#BDB4BE",textAlign:"center",marginTop:30}
