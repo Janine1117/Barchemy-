@@ -19,7 +19,7 @@ export default function Home() {
     <ScrollView style={s.page} contentContainerStyle={s.container}>
       <View style={s.brandRow}>
         <Text style={s.brand}>BARCHEMY</Text>
-        <Link href="/experience" style={s.intro}>VIEW INTRO  ↗</Link>
+        <Link href="/bar-tour" style={s.intro}>VIEW SIX SCENES  ↗</Link>
       </View>
       <Text style={s.eyebrow}>THE BARCHEMY EXPERIENCE</Text>
       <Text style={s.heading}>Welcome to J.Bink's Bar.</Text>
