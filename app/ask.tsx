@@ -17,6 +17,16 @@ const recipes = [
  {mood:"bold",name:"Classic Old Fashioned",needs:["bourbon","bitters","simple syrup"]},
  {mood:"surprise",name:"Pineapple Sunset",needs:["rum","pineapple","lime"]}
 ] as const;
+export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
+ return <View style={{flex:1,backgroundColor:"#120F14",padding:24,justifyContent:"center"}}>
+   <Text style={{color:"#D6A84F",fontSize:22,fontWeight:"800"}}>J.Bink's chat encountered an error</Text>
+   <Text style={{color:"#F4E9D0",marginTop:16,lineHeight:22}}>{error?.message||"The chat could not load."}</Text>
+   <Pressable accessibilityRole="button" onPress={retry} style={{backgroundColor:"#D6A84F",padding:16,borderRadius:12,marginTop:22}}>
+     <Text style={{color:"#120F14",textAlign:"center",fontWeight:"800"}}>TRY AGAIN</Text>
+   </Pressable>
+   <Link href="/home" style={{color:"#D6A84F",marginTop:24,textAlign:"center"}}>RETURN TO J.BINK'S BAR</Link>
+ </View>;
+}
 export default function Ask() {
  const [owned,setOwned]=useState<string[]>([]);
  const [show,setShow]=useState(false);
