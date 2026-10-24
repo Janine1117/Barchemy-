@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import BottomNav from "../components/BottomNav";
-import { saveMemory } from "../Lib/memories";
+
 
 const recipes = {
   balanced: {
@@ -33,6 +33,15 @@ const recipes = {
 type Mood = keyof typeof recipes;
 const stepNames = ["Prepare", "Measure", "Mix", "Pour", "Taste", "Finish"];
 
+export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
+  return <View style={{flex:1,backgroundColor:"#120F14",padding:24,justifyContent:"center"}}>
+    <Text style={{color:"#D6A84F",fontSize:22,fontWeight:"800"}}>Guided recipe could not load</Text>
+    <Text style={{color:"#F4E9D0",marginTop:16}}>{error?.message||"An unexpected error occurred."}</Text>
+    <Pressable accessibilityRole="button" onPress={retry} style={{padding:16,backgroundColor:"#D6A84F",borderRadius:12,marginTop:22}}><Text style={{color:"#120F14",textAlign:"center"}}>TRY AGAIN</Text></Pressable>
+    <Link href="/ask" style={{color:"#D6A84F",marginTop:22}}>RETURN TO J.BINK</Link>
+  </View>;
+}
+
 export default function FirstPour() {
   const params = useLocalSearchParams<{ mood?: string }>();
   const key = typeof params.mood === "string" && params.mood in recipes ? params.mood as Mood : "balanced";
@@ -47,6 +56,7 @@ export default function FirstPour() {
     setSaving(true);
     setStatus("");
     try {
+      const { saveMemory } = await import("../Lib/memories");
       const result = await saveMemory(recipe.name, recipe.ingredients.join(" · ") + " — " + recipe.steps.join(" "));
       setSaved(result.ok);
       setStatus(result.message);
