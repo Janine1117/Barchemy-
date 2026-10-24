@@ -33,6 +33,15 @@ const lessons = [
   }
 ] as const;
 
+export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
+  return <View style={{flex:1,backgroundColor:"#120F14",padding:24,justifyContent:"center"}}>
+    <Text style={{color:"#D6A84F",fontSize:22,fontWeight:"800"}}>Academy could not load</Text>
+    <Text style={{color:"#F4E9D0",marginTop:16}}>{error?.message||"An unexpected error occurred."}</Text>
+    <Pressable accessibilityRole="button" onPress={retry} style={{backgroundColor:"#D6A84F",padding:16,borderRadius:12,marginTop:22}}><Text style={{color:"#120F14",textAlign:"center"}}>TRY AGAIN</Text></Pressable>
+    <Link href="/experience" style={{color:"#D6A84F",marginTop:22}}>RETURN TO BARCHEMY EXPERIENCE</Link>
+  </View>;
+}
+
 export default function Academy() {
   const [active, setActive] = useState(0);
   const [answer, setAnswer] = useState<number | null>(null);
@@ -74,8 +83,8 @@ export default function Academy() {
       <Text style={s.intro}>Correct answers save your lesson progress on this device, including after refreshing the page.</Text>
       <View style={s.lessonTabs}>
         {lessons.map((item, index) => (
-          <Pressable key={item.title} accessibilityRole="button" onPress={() => selectLesson(index)} style={[s.tab,active===index&&s.activeTab]}>
-            <Text style={[s.tabText,active===index&&s.activeTabText]}>{completed.includes(index) ? "✓ COMPLETED" : `LESSON ${index+1}`}</Text>
+          <Pressable key={item.title} accessibilityRole="button" onPress={() => selectLesson(index)} style={active===index ? {...s.tab,...s.activeTab} : s.tab}>
+            <Text style={active===index ? {...s.tabText,...s.activeTabText} : s.tabText}>{completed.includes(index) ? "✓ COMPLETED" : `LESSON ${index+1}`}</Text>
             <Text style={s.tabLabel}>{item.title}</Text>
           </Pressable>
         ))}
@@ -90,7 +99,7 @@ export default function Academy() {
         <Text style={s.eyebrow}>CHECK YOUR KNOWLEDGE</Text>
         <Text style={s.question}>{lesson.question}</Text>
         {lesson.answers.map((choice,index) => (
-          <Pressable key={choice} accessibilityRole="button" onPress={()=>chooseAnswer(index)} style={[s.answer, answer===index&&s.selectedAnswer]}>
+          <Pressable key={choice} accessibilityRole="button" onPress={()=>chooseAnswer(index)} style={answer===index ? {...s.answer,...s.selectedAnswer} : s.answer}>
             <Text style={s.answerText}>{choice}</Text>
           </Pressable>
         ))}
