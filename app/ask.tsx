@@ -22,6 +22,19 @@ export default function Ask() {
  const [show,setShow]=useState(false);
  const [draft,setDraft]=useState("");
  const [conversation,setConversation]=useState<{from:"guest"|"jbink";text:string;mood?:string}[]>([]);
+ const [historyReady,setHistoryReady]=useState(false);
+ useEffect(()=>{
+   try {
+     const raw=(globalThis as any).localStorage?.getItem("barchemy.jbink.chat.v1");
+     const parsed=raw?JSON.parse(raw):[];
+     if(Array.isArray(parsed))setConversation(parsed.filter((item):item is {from:"guest"|"jbink";text:string;mood?:string}=>item&&["guest","jbink"].includes(item.from)&&typeof item.text==="string").slice(-40));
+   }catch{}
+   setHistoryReady(true);
+ },[]);
+ useEffect(()=>{
+   if(!historyReady)return;
+   try{(globalThis as any).localStorage?.setItem("barchemy.jbink.chat.v1",JSON.stringify(conversation.slice(-40)));}catch{}
+ },[conversation,historyReady]);
  useEffect(()=>{
    try { const raw=(globalThis as any).localStorage?.getItem("barchemy.mybar.v1");
      const items=raw?JSON.parse(raw):[];
@@ -43,7 +56,7 @@ export default function Ask() {
     else if(/have|ingredient|my bar|make with/.test(q)){reply="Open 'Find Drinks From My Ingredients' below to see what your saved collection can make.";}
     else if(/how|shake|stir|learn|jigger|measure/.test(q)){reply="Great question! Barchemy Academy covers tools and mixing technique. Citrus cocktails are usually shaken; spirit-forward classics are usually stirred.";}
     else reply="I can help you find fruity, bold, balanced, or surprise recipes. You can also ask about mixing technique or your saved ingredients.";
-    setConversation(previous=>[...previous,{from:"guest",text},{from:"jbink",text:reply,mood:!noAlcohol&&/fruit|tropical|pineapple|sweet|margarita|tequila|bold|strong|bourbon|whiskey|old fashioned|rye|surprise|rum/.test(q)?mood:undefined}]);
+    setConversation(previous=>[...previous.slice(-38),{from:"guest",text},{from:"jbink",text:reply,mood:!noAlcohol&&/fruit|tropical|pineapple|sweet|margarita|tequila|bold|strong|bourbon|whiskey|old fashioned|rye|surprise|rum/.test(q)?mood:undefined}]);
     setDraft("");
   }
   return (
@@ -57,12 +70,14 @@ export default function Ask() {
         </View>
       </View>
       <Text style={s.section}>CHAT WITH J.BINK · GUIDED PREVIEW</Text>
+      <Text style={s.note}>Conversation history is saved on this device until you clear it.</Text>
       <Text style={s.note}>Ask about flavors, cocktail styles, or techniques. This is an interactive scripted preview, not open-ended AI.</Text>
       {conversation.map((message,index)=><View key={index} style={[s.chatBubble,message.from==="guest"&&s.guestBubble]}>
         <Text style={s.chatLabel}>{message.from==="guest"?"YOU":"J.BINK"}</Text>
         <Text style={s.message}>{message.text}</Text>
         {message.mood&&<Link href={{pathname:"/first-pour",params:{mood:message.mood}}} style={s.matchLink}>OPEN GUIDED RECIPE →</Link>}
       </View>)}
+      {conversation.length>0&&<Pressable accessibilityRole="button" onPress={()=>setConversation([])} style={s.clearButton}><Text style={s.clearText}>CLEAR CHAT HISTORY</Text></Pressable>}
       <TextInput accessibilityLabel="Message J.Bink" placeholder="Ask J.Bink something..." placeholderTextColor="#998B9C" value={draft} onChangeText={setDraft} onSubmitEditing={respond} style={s.chatInput} returnKeyType="send"/>
       <Pressable accessibilityRole="button" onPress={respond} style={s.inventoryButton}><Text style={s.inventoryButtonText}>SEND MESSAGE →</Text></Pressable>
       <Text style={s.section}>MIX FROM MY BAR</Text>
@@ -110,5 +125,7 @@ const s=StyleSheet.create({
   chatBubble:{backgroundColor:"#302631",padding:16,borderRadius:14,marginTop:10,gap:8},
   guestBubble:{backgroundColor:"#243A32"},
   chatLabel:{color:"#D6A84F",fontSize:11,fontWeight:"800",letterSpacing:1},
+  clearButton:{alignSelf:"flex-end",paddingVertical:12,paddingHorizontal:5},
+  clearText:{color:"#D6A84F",fontSize:12,fontWeight:"700"},
   chatInput:{backgroundColor:"#211A25",borderColor:"#66516B",borderWidth:1,borderRadius:12,padding:15,color:"#F4E9D0",marginTop:14,fontSize:16}
 });
