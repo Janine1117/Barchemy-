@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import BottomNav from "../components/BottomNav";
+
 
 
 const recipes = {
@@ -43,8 +43,8 @@ export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
 }
 
 export default function FirstPour() {
-  const params = useLocalSearchParams<{ mood?: string }>();
-  const key = typeof params.mood === "string" && params.mood in recipes ? params.mood as Mood : "balanced";
+  const moodParam = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("mood") : null;
+  const key: Mood = moodParam === "fruity" || moodParam === "bold" || moodParam === "surprise" ? moodParam : "balanced";
   const recipe = recipes[key];
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -82,8 +82,8 @@ export default function FirstPour() {
         <Text style={s.heading}>GUIDED MIXING · STEP {step+1} OF {stepNames.length}</Text>
         <View style={s.stepRow}>
           {stepNames.map((name, i) => (
-            <Pressable key={name} accessibilityRole="button" onPress={()=>setStep(i)} style={[s.stepPill,i===step&&s.stepActive]}>
-              <Text style={[s.stepName,i===step&&s.stepTextActive]}>{i+1}</Text>
+            <Pressable key={name} accessibilityRole="button" onPress={()=>setStep(i)} style={i===step ? { ...s.stepPill, ...s.stepActive } : s.stepPill}>
+              <Text style={i===step ? { ...s.stepName, ...s.stepTextActive } : s.stepName}>{i+1}</Text>
             </Pressable>
           ))}
         </View>
@@ -99,7 +99,7 @@ export default function FirstPour() {
       {!!status && <Text style={s.status}>{status}</Text>}
       {saved && <Link href="/memory" style={s.viewMemories}>VIEW SAVED MEMORIES  →</Link>}
       <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
-      <BottomNav />
+      <Link href="/ask" style={s.viewMemories}>BACK TO J.BINK →</Link>
     </ScrollView>
   );
 }
