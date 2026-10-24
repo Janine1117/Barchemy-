@@ -89,7 +89,7 @@ export default function Experience() {
     <View style={{backgroundColor:theme.background,borderColor:theme.color,borderWidth:2,borderRadius:24}}><Stage step={step} /></View>
     <SeasonSelector />
     {step===scenes.length-1
-      ? <View style={s.finalActions}><Link href="/home" style={s.button}>START MIXING →</Link><Link href="/experience" style={s.secondaryButton}>EXPLORE BARCHEMY →</Link></View>
+      ? <View style={s.finalActions}><Link href="/ask" style={s.button}>ASK J.BINK & START MIXING →</Link><Link href="/experience" style={s.secondaryButton}>EXPLORE BARCHEMY →</Link></View>
       : <Pressable accessibilityRole="button" style={s.button} onPress={()=>setStep(step+1)}><Text style={s.buttonText}>CONTINUE  →</Text></Pressable>}
     <View style={s.footer}>
       {step>0?<Pressable accessibilityRole="button" onPress={()=>setStep(step-1)}><Text style={s.footerLink}>← PREVIOUS</Text></Pressable>:<Link href="/home" style={s.footerLink}>← THE BAR</Link>}
