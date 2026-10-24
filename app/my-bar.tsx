@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import BottomNav from "../components/BottomNav";
+import { Link } from "expo-router";
+
 
 const categories = ["Spirits", "Liqueurs & Syrups", "Mixers", "Fresh Ingredients", "Garnishes", "Equipment"] as const;
 type Category = typeof categories[number];
@@ -10,6 +11,15 @@ const STORAGE_KEY = "barchemy.mybar.v1";
 function getStorage() {
   try { return (globalThis as any).localStorage ?? null; } catch { return null; }
 }
+export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
+  return <View style={{flex:1,backgroundColor:"#120F14",padding:24,justifyContent:"center"}}>
+    <Text style={{color:"#D6A84F",fontSize:22,fontWeight:"800"}}>My Bar could not load</Text>
+    <Text style={{color:"#F4E9D0",marginTop:16}}>{error?.message||"An unexpected error occurred."}</Text>
+    <Pressable accessibilityRole="button" onPress={retry} style={{backgroundColor:"#D6A84F",padding:16,borderRadius:12,marginTop:22}}><Text style={{color:"#120F14",textAlign:"center"}}>TRY AGAIN</Text></Pressable>
+    <Link href="/experience" style={{color:"#D6A84F",marginTop:22}}>RETURN TO BARCHEMY EXPERIENCE</Link>
+  </View>;
+}
+
 export default function MyBar() {
   const [items, setItems] = useState<Ingredient[]>([]);
   const [category,setCategory]=useState<Category>("Spirits");
@@ -49,8 +59,8 @@ export default function MyBar() {
     <Text style={s.copy}>Build your personal collection. Ingredients entered here are stored on this device.</Text>
     <View style={s.categories}>
       {categories.map(x=>
-        <Pressable key={x} accessibilityRole="button" onPress={()=>{setCategory(x);setMessage("");}} style={[s.category,category===x&&s.categorySelected]}>
-          <Text style={[s.categoryName,category===x&&s.categoryNameSelected]}>{x}</Text>
+        <Pressable key={x} accessibilityRole="button" onPress={()=>{setCategory(x);setMessage("");}} style={category===x ? {...s.category,...s.categorySelected} : s.category}>
+          <Text style={category===x ? {...s.categoryName,...s.categoryNameSelected} : s.categoryName}>{x}</Text>
           <Text style={s.count}>{items.filter(y=>y.category===x).length}</Text>
         </Pressable>
       )}
@@ -70,7 +80,8 @@ export default function MyBar() {
       {!!message&&<Text style={s.message}>{message}</Text>}
     </View>
     <Text style={s.note}>Your ingredient collection is not yet synced with recipe recommendations or other devices.</Text>
-    <BottomNav/>
+    <Link href="/experience" style={s.back}>← BARCHEMY EXPERIENCE</Link>
+    <Link href="/ask" style={s.back}>ASK J.BINK →</Link>
     <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
   </ScrollView>;
 }
@@ -97,5 +108,6 @@ const s=StyleSheet.create({
   addText:{color:"#120F14",fontWeight:"800",textAlign:"center"},
   message:{color:"#D6A84F",marginTop:12},
   note:{color:"#BDB4BE",marginTop:20,lineHeight:20,fontSize:12},
-  toast:{color:"#D6A84F",textAlign:"center",marginTop:22}
+  toast:{color:"#D6A84F",textAlign:"center",marginTop:22},
+  back:{color:"#D6A84F",fontWeight:"700",textAlign:"center",marginTop:20}
 });
