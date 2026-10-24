@@ -1,7 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { loadMemories, type MemoryRow } from "../Lib/memories";
-import BottomNav from "../components/BottomNav";
+import { Link } from "expo-router";
+import type { MemoryRow } from "../Lib/memories";
+
+
+export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
+  return <View style={{flex:1,backgroundColor:"#120F14",padding:24,justifyContent:"center"}}>
+    <Text style={{color:"#D6A84F",fontSize:22,fontWeight:"800"}}>Memory Wall could not load</Text>
+    <Text style={{color:"#F4E9D0",marginTop:16}}>{error?.message||"An unexpected error occurred."}</Text>
+    <Pressable accessibilityRole="button" onPress={retry} style={{backgroundColor:"#D6A84F",padding:16,borderRadius:12,marginTop:22}}><Text style={{color:"#120F14",textAlign:"center"}}>TRY AGAIN</Text></Pressable>
+    <Link href="/ask" style={{color:"#D6A84F",marginTop:22}}>RETURN TO J.BINK</Link>
+  </View>;
+}
 
 export default function Memory() {
   const [memories, setMemories] = useState<MemoryRow[]>([]);
@@ -12,6 +22,7 @@ export default function Memory() {
     setLoading(true);
 
     try {
+      const { loadMemories } = await import("../Lib/memories");
       const result = await loadMemories();
       setMemories(result.memories);
 
@@ -58,7 +69,8 @@ export default function Memory() {
         <Text style={s.refreshText}>{loading ? "LOADING…" : "REFRESH MEMORIES"}</Text>
       </Pressable>
 
-      <BottomNav />
+      <Link href="/first-pour" style={s.back}>BACK TO GUIDED RECIPE →</Link>
+      <Link href="/ask" style={s.back}>ASK J.BINK →</Link>
       <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
     </ScrollView>
   );
@@ -81,4 +93,5 @@ const s = StyleSheet.create({
   refreshButton: { borderWidth: 1, borderColor: "#D6A84F", padding: 14, borderRadius: 12, marginTop: 20 },
   refreshText: { color: "#D6A84F", textAlign: "center", fontWeight: "700" },
   toast: { color: "#D6A84F", textAlign: "center", marginTop: 28 },
+  back: { color: "#D6A84F", fontWeight: "700", marginTop: 22, textAlign: "center" },
 });
