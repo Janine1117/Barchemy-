@@ -1,141 +1,72 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import JBinkPortrait from "../components/JBinkPortrait";
-import BottomNav from "../components/BottomNav";
 
-const choices = [
-  { label: "🍍 Something fruity", mood: "fruity", description: "Bright and refreshing" },
-  { label: "🥃 Something bold", mood: "bold", description: "Classic and full-flavored" },
-  { label: "🍋 Something balanced", mood: "balanced", description: "Easy to mix" },
-  { label: "✦ Surprise me", mood: "surprise", description: "A fresh recommendation" },
-] as const;
+type Mood = "fruity" | "bold" | "balanced" | "surprise";
+type Message = { from: "guest" | "jbink"; text: string; mood?: Mood };
+const choices: {label:string;mood:Mood}[] = [
+ {label:"Something fruity",mood:"fruity"},
+ {label:"Something bold",mood:"bold"},
+ {label:"Something balanced",mood:"balanced"},
+ {label:"Surprise me",mood:"surprise"}
+];
 
-const recipes = [
- {mood:"balanced",name:"Barchemy House Sour",needs:["whiskey","lemon","simple syrup"]},
- {mood:"fruity",name:"Honey Lime Margarita",needs:["tequila","lime","honey syrup"]},
- {mood:"bold",name:"Classic Old Fashioned",needs:["bourbon","bitters","simple syrup"]},
- {mood:"surprise",name:"Pineapple Sunset",needs:["rum","pineapple","lime"]}
-] as const;
 export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
- return <View style={{flex:1,backgroundColor:"#120F14",padding:24,justifyContent:"center"}}>
-   <Text style={{color:"#D6A84F",fontSize:22,fontWeight:"800"}}>J.Bink's chat encountered an error</Text>
-   <Text style={{color:"#F4E9D0",marginTop:16,lineHeight:22}}>{error?.message||"The chat could not load."}</Text>
-   <Pressable accessibilityRole="button" onPress={retry} style={{backgroundColor:"#D6A84F",padding:16,borderRadius:12,marginTop:22}}>
-     <Text style={{color:"#120F14",textAlign:"center",fontWeight:"800"}}>TRY AGAIN</Text>
-   </Pressable>
-   <Link href="/home" style={{color:"#D6A84F",marginTop:24,textAlign:"center"}}>RETURN TO J.BINK'S BAR</Link>
- </View>;
+ return <View style={styles.page}><Text style={styles.title}>J.Bink's chat needs attention</Text>
+ <Text style={styles.copy}>{error?.message || "Unable to load the chat."}</Text>
+ <Pressable onPress={retry} style={styles.button}><Text style={styles.buttonText}>TRY AGAIN</Text></Pressable>
+ <Link href="/home" style={styles.link}>RETURN TO THE BAR</Link></View>;
 }
-export default function Ask() {
- const [owned,setOwned]=useState<string[]>([]);
- const [show,setShow]=useState(false);
- const [draft,setDraft]=useState("");
- const [conversation,setConversation]=useState<{from:"guest"|"jbink";text:string;mood?:string}[]>([]);
- const [historyReady,setHistoryReady]=useState(false);
- useEffect(()=>{
-   try {
-     const raw=(globalThis as any).localStorage?.getItem("barchemy.jbink.chat.v1");
-     const parsed=raw?JSON.parse(raw):[];
-     if(Array.isArray(parsed))setConversation(parsed.filter((item):item is {from:"guest"|"jbink";text:string;mood?:string}=>item&&["guest","jbink"].includes(item.from)&&typeof item.text==="string").slice(-40));
-   }catch{}
-   setHistoryReady(true);
- },[]);
- useEffect(()=>{
-   if(!historyReady)return;
-   try{(globalThis as any).localStorage?.setItem("barchemy.jbink.chat.v1",JSON.stringify(conversation.slice(-40)));}catch{}
- },[conversation,historyReady]);
- useEffect(()=>{
-   try { const raw=(globalThis as any).localStorage?.getItem("barchemy.mybar.v1");
-     const items=raw?JSON.parse(raw):[];
-     if(Array.isArray(items)) setOwned(items.filter(x=>typeof x?.name==="string").map(x=>x.name.toLowerCase()));
-   } catch {}
- },[]);
- const matches=recipes.map(recipe=>({...recipe,have:recipe.needs.filter(need=>owned.some(item=>item.includes(need)||need.includes(item)||(need==="whiskey"&&item.includes("bourbon"))))})).sort((a,b)=>b.have.length-a.have.length);
 
-  function respond() {
-    const text=draft.trim();
-    if(!text)return;
-    const q=text.toLowerCase();
-    const noAlcohol=/mocktail|non.?alcohol|no alcohol|zero.?proof|without alcohol|sober/.test(q);
-    let mood="balanced",reply="";
-    if(noAlcohol) reply="Absolutely! Try sparkling water, fresh citrus, and a little syrup for a balanced zero-proof drink. My guided recipes currently contain alcohol, so I won't send you to one for this request.";
-    else if(/fruit|tropical|pineapple|sweet|margarita|tequila/.test(q)){mood="fruity";reply="Sounds like a bright, fruity pour! Honey Lime Margarita could be your next pick.";}
-    else if(/bold|strong|bourbon|whiskey|old fashioned|rye/.test(q)){mood="bold";reply="For a spirit-forward classic, try the Old Fashioned. Measure carefully and sip responsibly.";}
-    else if(/surprise|rum|pineapple/.test(q)){mood="surprise";reply="How about a Pineapple Sunset? Tropical and refreshing.";}
-    else if(/have|ingredient|my bar|make with/.test(q)){reply="Open 'Find Drinks From My Ingredients' below to see what your saved collection can make.";}
-    else if(/how|shake|stir|learn|jigger|measure/.test(q)){reply="Great question! Barchemy Academy covers tools and mixing technique. Citrus cocktails are usually shaken; spirit-forward classics are usually stirred.";}
-    else reply="I can help you find fruity, bold, balanced, or surprise recipes. You can also ask about mixing technique or your saved ingredients.";
-    setConversation(previous=>[...previous.slice(-38),{from:"guest",text},{from:"jbink",text:reply,mood:!noAlcohol&&/fruit|tropical|pineapple|sweet|margarita|tequila|bold|strong|bourbon|whiskey|old fashioned|rye|surprise|rum/.test(q)?mood:undefined}]);
-    setDraft("");
-  }
-  return (
-    <ScrollView style={s.page} contentContainerStyle={s.container}>
-      <Text style={s.eyebrow}>ASK J.BINK</Text>
-      <Text style={s.title}>What are you in the mood for?</Text>
-      <View style={s.bartender}>
-        <JBinkPortrait />
-        <View style={s.bubble}>
-          <Text style={s.message}>Hey there! I've got a few ideas for your next pour. Pick a mood, and we'll start mixing.</Text>
-        </View>
-      </View>
-      <Text style={s.section}>CHAT WITH J.BINK · GUIDED PREVIEW</Text>
-      <Text style={s.note}>Conversation history is saved on this device until you clear it.</Text>
-      <Text style={s.note}>Ask about flavors, cocktail styles, or techniques. This is an interactive scripted preview, not open-ended AI.</Text>
-      {conversation.map((message,index)=><View key={index} style={[s.chatBubble,message.from==="guest"&&s.guestBubble]}>
-        <Text style={s.chatLabel}>{message.from==="guest"?"YOU":"J.BINK"}</Text>
-        <Text style={s.message}>{message.text}</Text>
-        {message.mood&&<Link href={{pathname:"/first-pour",params:{mood:message.mood}}} style={s.matchLink}>OPEN GUIDED RECIPE →</Link>}
-      </View>)}
-      {conversation.length>0&&<Pressable accessibilityRole="button" onPress={()=>setConversation([])} style={s.clearButton}><Text style={s.clearText}>CLEAR CHAT HISTORY</Text></Pressable>}
-      <TextInput accessibilityLabel="Message J.Bink" placeholder="Ask J.Bink something..." placeholderTextColor="#998B9C" value={draft} onChangeText={setDraft} onSubmitEditing={respond} style={s.chatInput} returnKeyType="send"/>
-      <Pressable accessibilityRole="button" onPress={respond} style={s.inventoryButton}><Text style={s.inventoryButtonText}>SEND MESSAGE →</Text></Pressable>
-      <Text style={s.section}>MIX FROM MY BAR</Text>
-      <Pressable accessibilityRole="button" onPress={()=>setShow(!show)} style={s.inventoryButton}><Text style={s.inventoryButtonText}>{show?"HIDE RECIPE MATCHES":"FIND DRINKS FROM MY INGREDIENTS"} · {owned.length} saved</Text></Pressable>
-      {show && (owned.length===0 ? <Text style={s.note}>Add ingredients in My Bar first to see matches.</Text> : matches.map(recipe=><View key={recipe.mood} style={s.matchCard}>
-        <Text style={s.choice}>{recipe.name} · {recipe.have.length}/{recipe.needs.length} key ingredients</Text>
-        <Text style={s.detail}>Available: {recipe.have.join(", ")||"none yet"}</Text>
-        <Text style={s.detail}>Missing: {recipe.needs.filter(x=>!recipe.have.includes(x)).join(", ")||"none of the key ingredients"}</Text>
-        <Link href={{pathname:"/first-pour",params:{mood:recipe.mood}}} style={s.matchLink}>VIEW RECIPE →</Link>
-      </View>))}
-      <Text style={s.note}>Matches use a starter recipe library and your locally saved inventory. Check all ingredients before mixing.</Text>
-      <Text style={s.section}>LET'S FIND YOUR DRINK</Text>
-      {choices.map((choice) => (
-        <Link
-          key={choice.mood}
-          href={{ pathname: "/first-pour", params: { mood: choice.mood } }}
-          style={s.option}
-        >
-          <Text style={s.choice}>{choice.label}</Text>
-          <Text style={s.detail}>  ·  {choice.description}</Text>
-        </Link>
-      ))}
-      <Text style={s.note}>This preview uses curated cocktail choices. Open-ended AI chat is still in development.</Text>
-      <BottomNav />
-    </ScrollView>
-  );
+export default function Ask() {
+ const [draft,setDraft]=useState("");
+ const [messages,setMessages]=useState<Message[]>([]);
+ function send() {
+   const text=draft.trim();
+   if(!text)return;
+   const q=text.toLowerCase();
+   const zero=/mocktail|non.alcohol|no alcohol|zero.proof|without alcohol|sober/.test(q);
+   let mood:Mood|undefined;
+   let response:string;
+   if(zero) response="For a zero-proof option, try citrus, a little syrup, and sparkling water. Our guided cocktail recipes contain alcohol.";
+   else if(/fruit|tropical|sweet|margarita|tequila/.test(q)){mood="fruity";response="Try a Honey Lime Margarita! It's fresh and citrusy.";}
+   else if(/bold|strong|bourbon|whiskey|old fashioned|rye/.test(q)){mood="bold";response="Try a Classic Old Fashioned, a spirit-forward favorite.";}
+   else if(/surprise|rum|pineapple/.test(q)){mood="surprise";response="How about a Pineapple Sunset? It's tropical and refreshing.";}
+   else if(/ingredient|my bar|what i have|have at home/.test(q)) response="Visit My Bar to save your ingredients, then choose a cocktail to mix.";
+   else if(/shake|stir|jigger|measure|technique|learn/.test(q)) response="Shaking suits citrus drinks; stirring suits spirit-forward cocktails. Barchemy Academy has lessons on both.";
+   else {mood="balanced";response="Let's start with the Barchemy House Sour, or choose a mood below.";}
+   setMessages(previous=>[...previous.slice(-18),{from:"guest",text},{from:"jbink",text:response,mood}]);
+   setDraft("");
+ }
+ return <ScrollView style={styles.page} contentContainerStyle={styles.content}>
+   <Link href="/home" style={styles.link}>← J.BINK'S BAR</Link>
+   <Text style={styles.eyebrow}>ASK J.BINK</Text>
+   <Text style={styles.title}>What are you in the mood for?</Text>
+   <Text style={styles.copy}>Chat with J.Bink's guided preview. Open-ended AI conversations are still in development.</Text>
+   <View style={styles.card}><Text style={styles.copy}>Welcome! Tell me what flavors you like, or choose a drink below.</Text></View>
+   {messages.map((item,index)=><View key={index} style={styles.card}>
+     <Text style={styles.eyebrow}>{item.from==="guest"?"YOU":"J.BINK"}</Text>
+     <Text style={styles.copy}>{item.text}</Text>
+     {item.mood ? <Link href={{pathname:"/first-pour",params:{mood:item.mood}}} style={styles.link}>OPEN GUIDED RECIPE →</Link> : null}
+   </View>)}
+   <TextInput accessibilityLabel="Message J.Bink" value={draft} onChangeText={setDraft} onSubmitEditing={send} returnKeyType="send" placeholder="Ask J.Bink a question..." placeholderTextColor="#BDB4BE" style={styles.input}/>
+   <Pressable accessibilityRole="button" onPress={send} style={styles.button}><Text style={styles.buttonText}>SEND MESSAGE →</Text></Pressable>
+   <Text style={styles.eyebrow}>CHOOSE A MOOD</Text>
+   {choices.map(item=><Link key={item.mood} href={{pathname:"/first-pour",params:{mood:item.mood}}} style={styles.choice}>{item.label} →</Link>)}
+   <Link href="/my-bar" style={styles.link}>VISIT MY BAR →</Link>
+   <Link href="/academy" style={styles.link}>EXPLORE BARCHEMY ACADEMY →</Link>
+ </ScrollView>;
 }
-const s=StyleSheet.create({
-  page:{flex:1,backgroundColor:"#120F14"},
-  container:{padding:24,paddingTop:60,paddingBottom:40,flexGrow:1},
-  eyebrow:{color:"#D6A84F",letterSpacing:2,fontSize:12},
-  title:{color:"#F4E9D0",fontSize:30,fontWeight:"700",marginTop:12,marginBottom:19},
-  bartender:{backgroundColor:"#211A25",borderRadius:22,padding:20,alignItems:"center",borderColor:"#5A4230",borderWidth:1},
-  bubble:{backgroundColor:"#302631",borderRadius:14,padding:17,width:"100%",marginTop:15},
-  message:{color:"#F4E9D0",fontSize:16,lineHeight:24},
-  section:{color:"#D6A84F",letterSpacing:2,marginTop:25,marginBottom:8,fontSize:12},
-  option:{backgroundColor:"#211A25",color:"#F4E9D0",padding:16,borderWidth:1,borderColor:"#55405E",borderRadius:13,marginTop:10,overflow:"hidden"},
-  choice:{color:"#F4E9D0",fontWeight:"700",fontSize:15},
-  detail:{color:"#BDB4BE",fontSize:12},
-  note:{color:"#BDB4BE",fontSize:12,lineHeight:18,marginTop:18},
-  inventoryButton:{backgroundColor:"#315743",padding:15,borderRadius:12,marginTop:12},
-  inventoryButtonText:{color:"#F4E9D0",fontWeight:"800",textAlign:"center"},
-  matchCard:{backgroundColor:"#211A25",borderRadius:12,padding:15,marginTop:10,gap:9},
-  matchLink:{color:"#D6A84F",fontWeight:"800",marginTop:5},
-  chatBubble:{backgroundColor:"#302631",padding:16,borderRadius:14,marginTop:10,gap:8},
-  guestBubble:{backgroundColor:"#243A32"},
-  chatLabel:{color:"#D6A84F",fontSize:11,fontWeight:"800",letterSpacing:1},
-  clearButton:{alignSelf:"flex-end",paddingVertical:12,paddingHorizontal:5},
-  clearText:{color:"#D6A84F",fontSize:12,fontWeight:"700"},
-  chatInput:{backgroundColor:"#211A25",borderColor:"#66516B",borderWidth:1,borderRadius:12,padding:15,color:"#F4E9D0",marginTop:14,fontSize:16}
+const styles=StyleSheet.create({
+ page:{flex:1,backgroundColor:"#120F14"},
+ content:{padding:24,paddingTop:55,paddingBottom:60},
+ eyebrow:{color:"#D6A84F",fontSize:12,fontWeight:"700",letterSpacing:2,marginTop:22},
+ title:{color:"#F4E9D0",fontSize:29,fontWeight:"800",marginTop:12,marginBottom:16},
+ copy:{color:"#F4E9D0",fontSize:16,lineHeight:24,marginTop:8},
+ card:{backgroundColor:"#211A25",padding:18,borderRadius:15,marginTop:14},
+ input:{color:"#F4E9D0",backgroundColor:"#211A25",borderWidth:1,borderColor:"#D6A84F",borderRadius:12,padding:16,marginTop:22,fontSize:16},
+ button:{backgroundColor:"#D6A84F",padding:17,borderRadius:12,marginTop:12},
+ buttonText:{color:"#120F14",fontWeight:"800",textAlign:"center"},
+ link:{color:"#D6A84F",fontWeight:"700",marginTop:19},
+ choice:{color:"#F4E9D0",backgroundColor:"#211A25",padding:18,marginTop:10,borderRadius:12,overflow:"hidden",fontWeight:"700"}
 });
