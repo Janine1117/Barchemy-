@@ -37,11 +37,11 @@ export default function SeasonSelector() {
   return <View style={s.wrap}>
     <Text style={s.heading}>YOUR BAR ATMOSPHERE</Text>
     <Text style={s.copy}>Choose a season. Your selection stays with J.Bink's Bar on this device.</Text>
-    <View style={s.options}>{atmospheres.map(x=><Pressable key={x.name} accessibilityRole="button" accessibilityState={{selected:selected===x.name}} onPress={()=>choose(x.name)} style={[s.choice,selected===x.name&&{borderColor:x.color,backgroundColor:x.background}]}>
+    <View style={s.options}>{atmospheres.map(x=><Pressable key={x.name} accessibilityRole="button" accessibilityState={{selected:selected===x.name}} onPress={()=>choose(x.name)} style={selected===x.name ? {...s.choice,borderColor:x.color,backgroundColor:x.background} : s.choice}>
       <Text style={s.choiceText}>{x.icon} {x.name}</Text>
     </Pressable>)}</View>
-    <View style={[s.preview,{backgroundColor:theme.background,borderColor:theme.color}]}>
-      <Text style={[s.current,{color:theme.color}]}>{theme.icon} {theme.name.toUpperCase()} AT J.BINK'S</Text>
+    <View style={{...s.preview,backgroundColor:theme.background,borderColor:theme.color}}>
+      <Text style={{...s.current,color:theme.color}}>{theme.icon} {theme.name.toUpperCase()} AT J.BINK'S</Text>
       <Text style={s.copy}>{theme.description}</Text>
       <Text style={s.note}>Seasonal colors and inspiration are active. Fully illustrated seasonal environments are still being developed.</Text>
     </View>
