@@ -20,19 +20,19 @@ const sections: LegalSection[] = [
     heading: "Accounts and saved content",
     paragraphs: [
       "If you create an account, provide accurate information and protect your sign-in credentials. Your saved recipes and inventory remain your content.",
-      "Some items may be saved in your device's browser storage. Signed-in cocktail memories may be saved to your account through Supabase. Device-only data may be lost when browser storage is cleared or when you switch devices. Please keep copies of anything important to you."
+      "My Bar inventory and memories saved while signed out are stored in the browser on your device. Signed-in cocktail memories are saved to your account through Supabase when that service is available. Device-only data may be lost if browser storage is cleared or you switch devices. Keep a separate copy of anything important to you."
     ]
   },
   {
-    heading: "Barchemy Founder's Access",
+    heading: "Barchemy Founder’s Access",
     paragraphs: [
-      "Founder's Access costs $9.99 USD as a single, non-recurring purchase, plus any applicable tax shown at checkout. It includes a digital welcome card, early product updates, and opportunities to share feedback about Barchemy.",
-      "Founder's Access is a supporter offering. It is not an investment, ownership stake, guaranteed future feature, lifetime premium subscription, or promise of priority access to features that do not yet exist. Current free app features remain available without this purchase. Payments are processed by Stripe."
+      "Founder’s Access costs $9.99 USD as a single, non-recurring purchase, plus any applicable tax shown at checkout. It includes a digital welcome card, early product updates, and opportunities to share feedback about Barchemy.",
+      "Founder’s Access is a supporter offering. It is not an investment, ownership stake, guaranteed future feature, lifetime premium subscription, or promise of priority access to features that do not yet exist. Current free app features remain available without this purchase. Payments are processed by Stripe."
     ]
   },
   {
     heading: "Refunds",
-    paragraphs: ["For Founder's Access, you can request a refund within seven calendar days of purchase. See the separate Refund Policy for instructions and details. Your rights under applicable law are not limited by these terms."]
+    paragraphs: ["For Founder’s Access, you can request a full refund within seven calendar days of purchase. See the separate Refund Policy for instructions and details. Your rights under applicable law are not limited by these terms."]
   },
   {
     heading: "Acceptable use and intellectual property",
@@ -49,5 +49,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function Terms() {
-  return <LegalPage eyebrow="LEGAL" title="Terms of Service" introduction="Please read these terms before using Barchemy or purchasing Founder's Access." sections={sections} />;
+  return <LegalPage eyebrow="LEGAL" title="Terms of Service" introduction="Please read these terms before using Barchemy or purchasing Founder’s Access." sections={sections} />;
 }

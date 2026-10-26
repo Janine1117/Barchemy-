@@ -12,13 +12,13 @@ const sections: LegalSection[] = [
       "If you save recipes: cocktail titles, recipe details, and timestamps. Signed-in memories can be stored with your account; otherwise, memories can be saved in the browser on your device.",
       "If you use My Bar: your spirits, mixers, garnishes, and equipment selections can be kept in the browser's local storage.",
       "If you ask J.Bink a question: the current guided-preview chat processes your text in the app to show a scripted response. It is not currently an open-ended third-party AI conversation.",
-      "If you purchase Founder's Access: Stripe collects and processes payment and relevant billing/contact details. Barchemy can receive the transaction information necessary to support your purchase and deliver benefits; Barchemy's app does not collect your full payment-card number.",
+      "If you purchase Founder’s Access: Stripe collects and processes payment and relevant billing/contact details. We can view transaction, customer contact, and payment-status information in Stripe to support your purchase and deliver benefits. The Barchemy app does not handle your full payment-card number.",
       "Basic technical information, such as IP addresses, requests, device/browser details, and errors, may be processed by hosting and service providers to run and secure the website."
     ]
   },
   {
     heading: "How information is used",
-    paragraphs: ["We use information to provide the app, authenticate accounts, save and retrieve content, process purchases, provide the promised Founder's Access benefits and product updates, respond to support requests, prevent misuse, and maintain the service."]
+    paragraphs: ["We use information to provide the app, authenticate accounts, save and retrieve content, process purchases, provide the promised Founder’s Access benefits and product updates, respond to support requests, prevent misuse, and maintain the service. Founder supporters can request to stop receiving product-update emails by contacting BarchemyAdmin@thingsbyjanine.me."]
   },
   {
     heading: "Service providers and sharing",

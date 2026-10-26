@@ -7,7 +7,7 @@ export default function FounderWelcome() {
       <View style={s.card}>
         <Text style={s.sparkle}>✦  ✨  ✦</Text>
         <Text style={s.brand}>BARCHEMY</Text>
-        <Text style={s.eyebrow}>FOUNDER'S ACCESS</Text>
+        <Text style={s.eyebrow}>FOUNDER’S ACCESS</Text>
         <Text style={s.title}>You're part of the first pour.</Text>
         <View style={s.line} />
         <Text style={s.body}>Thank you for believing in the magic we're creating together.</Text>
@@ -18,7 +18,7 @@ export default function FounderWelcome() {
       <Text style={s.item}>✦ This digital welcome card</Text>
       <Text style={s.item}>✦ Early Barchemy product updates</Text>
       <Text style={s.item}>✦ Opportunities to share feedback</Text>
-      <Text style={s.note}>Founder's Access is a $9.99 one-time supporter purchase. It does not include a premium subscription, equity, or guaranteed future features. Keep your Stripe receipt as proof of purchase; visiting this public card alone does not verify a purchase.</Text>
+      <Text style={s.note}>Founder’s Access is a $9.99 one-time supporter purchase. It does not include a premium subscription, ownership, or guaranteed future features. Keep your Stripe receipt as proof of purchase; opening this public card alone does not verify a purchase.</Text>
       <Text style={s.note}>For delivery or purchase questions, email BarchemyAdmin@thingsbyjanine.me.</Text>
       <Link href="/experience" style={s.button}>EXPLORE BARCHEMY →</Link>
       <View style={s.legal}>

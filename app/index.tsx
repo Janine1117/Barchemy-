@@ -6,11 +6,11 @@ export default function Welcome() {
     <Text style={s.eyebrow}>WELCOME TO BARCHEMY</Text>
     <Text style={s.title}>Your bar. Your moment. Your magic.</Text>
     <Link href="/experience" style={s.button}>ENTER BARCHEMY</Link>
-      <View style={s.policyLinks}>
-        <Link href="/terms" style={s.policyLink}>TERMS</Link>
-        <Link href="/privacy" style={s.policyLink}>PRIVACY</Link>
-        <Link href="/refunds" style={s.policyLink}>REFUNDS</Link>
-      </View>
+    <View style={s.policyLinks}>
+      <Link href="/terms" style={s.policyLink}>TERMS</Link>
+      <Link href="/privacy" style={s.policyLink}>PRIVACY</Link>
+      <Link href="/refunds" style={s.policyLink}>REFUNDS</Link>
+    </View>
     <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
   </View>;
 }

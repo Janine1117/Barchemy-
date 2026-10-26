@@ -20,7 +20,7 @@ export default function LegalPage({ eyebrow, title, introduction, sections }: Pr
       <Link href="/experience" style={s.back}>← BARCHEMY EXPERIENCE</Link>
       <Text style={s.eyebrow}>{eyebrow}</Text>
       <Text style={s.title}>{title}</Text>
-      <Text style={s.date}>Effective October 26, 2026</Text>
+      <Text style={s.date}>Last updated October 26, 2026</Text>
       <Text style={s.intro}>{introduction}</Text>
       {sections.map((section) => (
         <View key={section.heading} style={s.section}>
