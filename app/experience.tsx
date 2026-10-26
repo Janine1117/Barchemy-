@@ -27,7 +27,7 @@ export default function Experience() {
       <View style={s.hero}>
         <JBinkPortrait />
         <Text style={s.heroName}>MEET J.BINK</Text>
-        <Text style={s.heroText}>Your AI bartender is ready to help you explore, learn, and make something special.</Text>
+        <Text style={s.heroText}>J.Bink's guided bartender preview can help you explore drinks and learn mixing basics. Open-ended AI chat is still in development.</Text>
         <Link href="/bar-tour" style={s.primary}>ENTER J.BINK'S BAR →</Link>
         <Link href="/bar-tour" style={s.secondary}>EXPLORE THE SIX BAR SCENES</Link>
       </View>
@@ -82,6 +82,11 @@ export default function Experience() {
         <Text style={s.plannedTitle}>BARCHEMY MAGIC  ·  COMING SOON</Text>
         <Text style={s.plannedBody}>Explore flavor challenges, seasonal events, and discovery.</Text>
       </View>
+      <View style={s.policyLinks}>
+        <Link href="/terms" style={s.policyLink}>TERMS</Link>
+        <Link href="/privacy" style={s.policyLink}>PRIVACY</Link>
+        <Link href="/refunds" style={s.policyLink}>REFUNDS</Link>
+      </View>
       <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
     </ScrollView>
   );
@@ -123,5 +128,7 @@ const s = StyleSheet.create({
   planned:{borderBottomWidth:1,borderBottomColor:"#453747",paddingVertical:17},
   plannedTitle:{color:"#F4E9D0",fontWeight:"800",fontSize:13,letterSpacing:.6},
   plannedBody:{color:"#BDB4BE",lineHeight:21,marginTop:7},
+  policyLinks:{flexDirection:"row",flexWrap:"wrap",justifyContent:"center",gap:20,marginTop:32},
+  policyLink:{color:"#D6A84F",fontSize:12,fontWeight:"800"},
   toast:{color:"#D6A84F",textAlign:"center",marginTop:31}
 });
