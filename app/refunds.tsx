@@ -28,5 +28,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function Refunds() {
-  return <LegalPage eyebrow="FOUNDER'S ACCESS" title="Refund Policy" introduction="We want you to feel comfortable supporting Barchemy's early journey." sections={sections} />;
+  return <LegalPage eyebrow="FOUNDER’S ACCESS" title="Refund Policy" introduction="This policy explains refunds for the one-time Founder’s Access purchase." sections={sections} />;
 }

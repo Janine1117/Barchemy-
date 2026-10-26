@@ -43,5 +43,5 @@ const sections: LegalSection[] = [
 ];
 
 export default function Privacy() {
-  return <LegalPage eyebrow="YOUR INFORMATION" title="Privacy Policy" introduction="Your cocktail memories are personal. Here's how the current Barchemy web experience handles information." sections={sections} />;
+  return <LegalPage eyebrow="YOUR INFORMATION" title="Privacy Policy" introduction="Your cocktail memories are personal. This policy explains how the current Barchemy web experience handles information." sections={sections} />;
 }
