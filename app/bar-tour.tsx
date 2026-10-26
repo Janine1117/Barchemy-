@@ -96,6 +96,7 @@ export default function Experience() {
     <Text style={s.copy}>{scene.copy}</Text>
     <View style={{backgroundColor:theme.background,borderColor:theme.color,borderWidth:2,borderRadius:24}}><Stage step={step} /></View>
     <SeasonSelector />
+    <Link href="/academy" style={s.secondaryButton}>EXPLORE BARCHEMY ACADEMY →</Link>
     {step===scenes.length-1
       ? <View style={s.finalActions}><Link href="/ask" style={s.button}>ASK J.BINK & START MIXING →</Link><Link href="/experience" style={s.secondaryButton}>EXPLORE BARCHEMY →</Link></View>
       : <Pressable accessibilityRole="button" style={s.button} onPress={()=>setStep(step+1)}><Text style={s.buttonText}>CONTINUE  →</Text></Pressable>}
