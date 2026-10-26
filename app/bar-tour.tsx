@@ -17,7 +17,7 @@ const gold="#D6A84F", cream="#F4E9D0";
 function Shelf() {
   return <View style={s.shelf}>
     {[58,81,68,92,62,76,58].map((height,i)=>
-      <View key={i} style={[s.bottle,{height,backgroundColor:["#67472D","#927144","#603625","#A27332"][i%4]}]} />
+      <View key={i} style={{...s.bottle,height,backgroundColor:["#67472D","#927144","#603625","#A27332"][i%4]}} />
     )}
   </View>;
 }
@@ -72,6 +72,14 @@ function Stage({step}:{step:number}) {
     <Text style={s.stageCopy}>Sip. Smile. Repeat. ✨</Text>
   </View>;
 }
+export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
+ return <View style={{flex:1,backgroundColor:"#120F14",padding:24,justifyContent:"center"}}>
+ <Text style={{color:"#D6A84F",fontSize:22,fontWeight:"800"}}>Bar tour could not load</Text>
+ <Text style={{color:"#F4E9D0",marginTop:16}}>{error?.message||"An unexpected error occurred."}</Text>
+ <Pressable accessibilityRole="button" onPress={retry} style={{backgroundColor:"#D6A84F",padding:16,borderRadius:12,marginTop:22}}><Text style={{color:"#120F14",textAlign:"center"}}>TRY AGAIN</Text></Pressable>
+ <Link href="/experience" style={{color:"#D6A84F",marginTop:22}}>RETURN TO BARCHEMY EXPERIENCE</Link>
+ </View>;
+}
 export default function Experience() {
   const [step,setStep]=useState(0);
   const scene=scenes[step];
@@ -82,7 +90,7 @@ export default function Experience() {
       <Text style={s.count}>{step+1} / {scenes.length}</Text>
     </View>
     <Text style={{color:theme.color,marginTop:15,fontWeight:"700"}}>{theme.icon} {theme.name.toUpperCase()} BAR ATMOSPHERE</Text>
-    <View style={s.progress}>{scenes.map((_,i)=><View key={i} style={[s.segment,i<=step&&s.segmentOn]}/>)}</View>
+    <View style={s.progress}>{scenes.map((_,i)=><View key={i} style={i<=step ? {...s.segment,...s.segmentOn} : s.segment}/>)}</View>
     <Text style={s.eyebrow}>{scene.eyebrow}</Text>
     <Text style={s.title}>{scene.title}</Text>
     <Text style={s.copy}>{scene.copy}</Text>
