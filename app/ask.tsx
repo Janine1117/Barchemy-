@@ -11,6 +11,21 @@ const choices: {label:string;mood:Mood}[] = [
  {label:"Surprise me",mood:"surprise"}
 ];
 
+function myBarSuggestion(): {mood:Mood;response:string}|null {
+ try {
+ const raw=(globalThis as any).localStorage?.getItem("barchemy.mybar.v1");
+ const items=raw?JSON.parse(raw):[];
+ if(!Array.isArray(items))return null;
+ const names=items.filter((x:any)=>x&&typeof x.name==="string").map((x:any)=>x.name.toLowerCase());
+ const has=(s:string)=>names.some((n:string)=>n.includes(s));
+ if(has("tequila")&&has("lime"))return {mood:"fruity",response:"Your tequila and lime are a great start for a Honey Lime Margarita. Check the recipe for honey syrup."};
+ if((has("whiskey")||has("bourbon")||has("rye"))&&has("bitters"))return {mood:"bold",response:"Your whiskey and bitters are a great start for a Classic Old Fashioned. Check the recipe for any missing ingredients."};
+ if(has("rum")&&has("pineapple"))return {mood:"surprise",response:"Your rum and pineapple are a great start for Pineapple Sunset. Check the recipe for citrus and syrup."};
+ if((has("whiskey")||has("bourbon"))&&has("lemon"))return {mood:"balanced",response:"Your whiskey and lemon are a great start for the Barchemy House Sour. Check the recipe for syrup."};
+ return null;
+ }catch{return null;}
+}
+
 export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
  return <View style={styles.page}><Text style={styles.title}>J.Bink's chat needs attention</Text>
  <Text style={styles.copy}>{error?.message || "Unable to load the chat."}</Text>
@@ -28,11 +43,14 @@ export default function Ask() {
    const zero=/mocktail|non.alcohol|no alcohol|zero.proof|without alcohol|sober/.test(q);
    let mood:Mood|undefined;
    let response:string;
-   if(zero) response="For a zero-proof option, try citrus, a little syrup, and sparkling water. Our guided cocktail recipes contain alcohol.";
+   const wantsBar=/ingredient|my bar|what i have|have at home|make with|use what i have/.test(q);
+   const match=wantsBar?myBarSuggestion():null;
+   if(match){mood=match.mood;response=match.response;}
+   else if(wantsBar) response="I don't see a close match among my four guided recipes yet. Check your saved ingredients in My Bar, or choose a flavor mood below.";
+   else if(zero) response="For a zero-proof option, try citrus, a little syrup, and sparkling water. Our guided cocktail recipes contain alcohol.";
    else if(/fruit|tropical|sweet|margarita|tequila/.test(q)){mood="fruity";response="Try a Honey Lime Margarita! It's fresh and citrusy.";}
    else if(/bold|strong|bourbon|whiskey|old fashioned|rye/.test(q)){mood="bold";response="Try a Classic Old Fashioned, a spirit-forward favorite.";}
    else if(/surprise|rum|pineapple/.test(q)){mood="surprise";response="How about a Pineapple Sunset? It's tropical and refreshing.";}
-   else if(/ingredient|my bar|what i have|have at home/.test(q)) response="Visit My Bar to save your ingredients, then choose a cocktail to mix.";
    else if(/shake|stir|jigger|measure|technique|learn/.test(q)) response="Shaking suits citrus drinks; stirring suits spirit-forward cocktails. Barchemy Academy has lessons on both.";
    else {mood="balanced";response="Let's start with the Barchemy House Sour, or choose a mood below.";}
    setMessages(previous=>[...previous.slice(-18),{from:"guest",text},{from:"jbink",text:response,mood}]);
