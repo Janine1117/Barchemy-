@@ -52,6 +52,8 @@ export default function Home() {
         <Link href="/my-bar" style={s.tile}>◈  MY BAR</Link>
         <Link href="/first-pour" style={s.tile}>♧  THE FIRST POUR</Link>
         <Link href="/memory" style={s.tile}>♡  MEMORY WALL</Link>
+        <Link href="/academy" style={s.tile}>🎓  ACADEMY</Link>
+        <Link href="/experience" style={s.tile}>✦  BARCHEMY EXPERIENCE</Link>
       </View>
       <BottomNav />
       <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
