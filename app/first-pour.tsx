@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "expo-router";
+import { Link, useGlobalSearchParams } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 
@@ -43,9 +43,14 @@ export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
 }
 
 export default function FirstPour() {
-  const moodParam = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("mood") : null;
+  const params = useGlobalSearchParams<{mood?:string}>();
+  const moodParam = params.mood;
   const key: Mood = moodParam === "fruity" || moodParam === "bold" || moodParam === "surprise" ? moodParam : "balanced";
-  const recipe = recipes[key];
+  return <RecipeSession key={key} recipeKey={key} />;
+}
+
+function RecipeSession({recipeKey}:{recipeKey:Mood}) {
+  const recipe = recipes[recipeKey];
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
