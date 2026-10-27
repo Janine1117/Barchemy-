@@ -79,7 +79,7 @@ export default function Ask() {
    <Link href="/home" style={styles.link}>← J.BINK'S BAR</Link>
    <Text style={styles.eyebrow}>ASK J.BINK</Text>
    <Text style={styles.title}>What are you in the mood for?</Text>
-   <Text style={styles.copy}>Chat with J.Bink's guided preview. Open-ended AI conversations are still in development.</Text>
+   <Text style={styles.copy}>{aiEnabled ? "Ask J.Bink about cocktails, ingredients, and techniques." : "Chat with J.Bink's guided preview. Open-ended AI conversations are still in development."}</Text>
    <View style={styles.card}><Text style={styles.copy}>Welcome! Tell me what flavors you like, or choose a drink below.</Text></View>
    {messages.map((item,index)=><View key={index} style={styles.card}>
      <Text style={styles.eyebrow}>{item.from==="guest"?"YOU":"J.BINK"}</Text>
