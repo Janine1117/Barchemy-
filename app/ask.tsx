@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { askJbinkAI } from "../Lib/jbink-ai";
 import { Link } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 type Mood = "fruity" | "bold" | "balanced" | "surprise";
 type Message = { from: "guest" | "jbink"; text: string; mood?: Mood };
+const aiEnabled = process.env.EXPO_PUBLIC_JBINK_AI_ENABLED === "true";
 const choices: {label:string;mood:Mood}[] = [
  {label:"Something fruity",mood:"fruity"},
  {label:"Something bold",mood:"bold"},
@@ -35,10 +37,27 @@ export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
 
 export default function Ask() {
  const [draft,setDraft]=useState("");
+ const [sending,setSending]=useState(false);
+ const [chatError,setChatError]=useState("");
  const [messages,setMessages]=useState<Message[]>([]);
- function send() {
+ async function send() {
+   if(sending)return;
    const text=draft.trim();
    if(!text)return;
+   if(aiEnabled){
+     const history = [...messages.map(item => ({role: item.from === "guest" ? "user" as const : "assistant" as const, content: item.text})), {role:"user" as const, content:text}];
+     setMessages(previous=>[...previous.slice(-18),{from:"guest",text}]);
+     setDraft("");
+     setSending(true);
+     setChatError("");
+     try {
+       const reply = await askJbinkAI(history);
+       setMessages(previous=>[...previous.slice(-18),{from:"jbink",text:reply}]);
+     } catch(e) {
+       setChatError(e instanceof Error ? e.message : "J.Bink is temporarily unavailable. Try a guided recipe.");
+     } finally { setSending(false); }
+     return;
+   }
    const q=text.toLowerCase();
    const zero=/mocktail|non.alcohol|no alcohol|zero.proof|without alcohol|sober/.test(q);
    let mood:Mood|undefined;
@@ -67,8 +86,9 @@ export default function Ask() {
      <Text style={styles.copy}>{item.text}</Text>
      {item.mood ? <Link href={{pathname:"/first-pour",params:{mood:item.mood}}} style={styles.link}>OPEN GUIDED RECIPE →</Link> : null}
    </View>)}
-   <TextInput accessibilityLabel="Message J.Bink" value={draft} onChangeText={setDraft} onSubmitEditing={send} returnKeyType="send" placeholder="Ask J.Bink a question..." placeholderTextColor="#BDB4BE" style={styles.input}/>
-   <Pressable accessibilityRole="button" onPress={send} style={styles.button}><Text style={styles.buttonText}>SEND MESSAGE →</Text></Pressable>
+   {!!chatError && <Text accessibilityRole="alert" style={styles.copy}>{chatError}</Text>}
+   <TextInput accessibilityLabel="Message J.Bink" value={draft} onChangeText={setDraft} onSubmitEditing={send} editable={!sending} returnKeyType="send" placeholder="Ask J.Bink a question..." placeholderTextColor="#BDB4BE" style={styles.input}/>
+   <Pressable accessibilityRole="button" onPress={send} disabled={sending} style={styles.button}><Text style={styles.buttonText}>{sending ? "J.BINK IS THINKING..." : "SEND MESSAGE →"}</Text></Pressable>
    <Text style={styles.eyebrow}>CHOOSE A MOOD</Text>
    {choices.map(item=><Link key={item.mood} href={{pathname:"/first-pour",params:{mood:item.mood}}} style={styles.choice}>{item.label} →</Link>)}
    <Link href="/my-bar" style={styles.link}>VISIT MY BAR →</Link>
