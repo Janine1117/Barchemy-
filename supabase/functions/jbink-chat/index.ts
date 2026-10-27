@@ -1,4 +1,4 @@
-// Staged prototype only: do not deploy until server-side quotas and billing caps are configured.
+// Staged prototype only: do not deploy until SQL quota, API key, and billing controls are verified.
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const allowedOrigin = "https://barchemy.onrender.com";
@@ -23,9 +23,14 @@ Deno.serve(async (req: Request) => {
   try { body = await req.json(); } catch { return json({ error: "Invalid JSON" }, 400); }
   const messages = body.messages;
   if (!Array.isArray(messages) || messages.length < 1 || messages.length > 12 ||
-      messages.some(m => !["user", "assistant"].includes(m.role ?? "") || typeof m.content !== "string" || m.content.length > 1000))
+      messages.some(m => !["user", "assistant"].includes(m.role ?? "") || typeof m.content !== "string" || m.content.length > 1000) || messages.at(-1)?.role !== "user")
     return json({ error: "Invalid conversation" }, 400);
   const ingredients = Array.isArray(body.ingredients) ? body.ingredients.filter(x => typeof x === "string").slice(0, 40).map(x => x.slice(0, 60)) : [];
+  // Reserve quota atomically before making any billable request. Failed upstream calls still consume a slot.
+  const userClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!, {global:{headers:{Authorization: req.headers.get("authorization")!}}});
+  const { data: permitted, error: quotaError } = await userClient.rpc("reserve_jbink_message");
+  if (quotaError) return json({ error: "AI quota is not configured" }, 503);
+  if (!permitted) return json({ error: "You have reached your 10 AI messages for today. Guided recipes are still available." }, 429);
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: { "Authorization": `Bearer ${key}`, "Content-Type": "application/json" },
