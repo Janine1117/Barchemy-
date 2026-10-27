@@ -39,6 +39,7 @@ export default function Ask() {
  const [draft,setDraft]=useState("");
  const [sending,setSending]=useState(false);
  const [chatError,setChatError]=useState("");
+ const [showPlusOffer,setShowPlusOffer]=useState(false);
  const [messages,setMessages]=useState<Message[]>([]);
  async function send() {
    if(sending)return;
@@ -54,7 +55,9 @@ export default function Ask() {
        const reply = await askJbinkAI(history);
        setMessages(previous=>[...previous.slice(-18),{from:"jbink",text:reply}]);
      } catch(e) {
-       setChatError(e instanceof Error ? e.message : "J.Bink is temporarily unavailable. Try a guided recipe.");
+       const message = e instanceof Error ? e.message : "J.Bink is temporarily unavailable. Try a guided recipe.";
+       setChatError(message);
+       if (/10 AI messages|daily limit|quota reached/i.test(message)) setShowPlusOffer(true);
      } finally { setSending(false); }
      return;
    }
@@ -84,9 +87,15 @@ export default function Ask() {
    {messages.map((item,index)=><View key={index} style={styles.card}>
      <Text style={styles.eyebrow}>{item.from==="guest"?"YOU":"J.BINK"}</Text>
      <Text style={styles.copy}>{item.text}</Text>
+     {aiEnabled && item.from==="jbink" ? <Text style={styles.plusHint}>SAVE J.BINK\'S RESPONSE · J.BINK AI PLUS ($2.99/MONTH) — COMING SOON</Text> : null}
      {item.mood ? <Link href={{pathname:"/first-pour",params:{mood:item.mood}}} style={styles.link}>OPEN GUIDED RECIPE →</Link> : null}
    </View>)}
    {!!chatError && <Text accessibilityRole="alert" style={styles.copy}>{chatError}</Text>}
+   {aiEnabled && showPlusOffer ? <View style={styles.card}>
+     <Text style={styles.eyebrow}>J.BINK AI PLUS · COMING SOON</Text>
+     <Text style={styles.copy}>You have enjoyed your 10 free AI messages for today. Return tomorrow for more, or look forward to J.Bink AI Plus at $2.99/month, with the ability to save and revisit J.Bink\'s personalized responses.</Text>
+     <Text style={styles.plusHint}>Subscriptions and saved AI replies are not available yet. No payment will be collected here.</Text>
+   </View> : null}
    <TextInput accessibilityLabel="Message J.Bink" value={draft} onChangeText={setDraft} onSubmitEditing={send} editable={!sending} returnKeyType="send" placeholder="Ask J.Bink a question..." placeholderTextColor="#BDB4BE" style={styles.input}/>
    <Pressable accessibilityRole="button" onPress={send} disabled={sending} style={styles.button}><Text style={styles.buttonText}>{sending ? "J.BINK IS THINKING..." : "SEND MESSAGE →"}</Text></Pressable>
    <Text style={styles.eyebrow}>CHOOSE A MOOD</Text>
@@ -106,5 +115,6 @@ const styles=StyleSheet.create({
  button:{backgroundColor:"#D6A84F",padding:17,borderRadius:12,marginTop:12},
  buttonText:{color:"#120F14",fontWeight:"800",textAlign:"center"},
  link:{color:"#D6A84F",fontWeight:"700",marginTop:19},
+ plusHint:{color:"#D6A84F",fontSize:12,marginTop:12,lineHeight:19},
  choice:{color:"#F4E9D0",backgroundColor:"#211A25",padding:18,marginTop:10,borderRadius:12,overflow:"hidden",fontWeight:"700"}
 });
