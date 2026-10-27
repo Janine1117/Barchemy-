@@ -17,3 +17,10 @@
 6. Offer an accessible billing-management/cancel link and test purchase, renewal, failed payment, cancellation, and access expiry.
 7. Confirm tax, receipts, customer support, and mobile checkout.
 8. Keep the upgrade prompt clearly labeled as **coming soon** until all the above work.
+
+## Founder badge (one-time purchase, separate entitlement)
+- Founder's Access buyers receive a cosmetic **Founding Member** badge after the $9.99 one-time purchase is verified server-side.
+- Badge must never imply J.Bink AI Plus, premium AI message quota, equity, or lifetime access.
+- Verify payment using Stripe signed webhook events and map Stripe customer to authenticated Supabase user via trusted server-created checkout metadata; never trust an email match or checkout redirect alone.
+- Display badge only after an account-linked entitlement is confirmed; support refunds/disputes by revoking entitlement as appropriate.
+- Keep badge and checkout hidden or marked coming soon until fulfillment, policy, and end-to-end testing are complete.
