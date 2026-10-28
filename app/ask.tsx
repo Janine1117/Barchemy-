@@ -11,19 +11,27 @@ const choices: {label:string;mood:Mood}[] = [
  {label:"Surprise me",mood:"surprise"}
 ];
 
-function myBarSuggestion(): {mood:Mood;response:string}|null {
+const recipeOptions: {mood:Mood;name:string;needs:string[][]}[] = [
+ {mood:"fruity",name:"Honey Lime Margarita",needs:[["tequila"],["lime"],["honey syrup","honey"]]},
+ {mood:"bold",name:"Classic Old Fashioned",needs:[["bourbon","rye","whiskey"],["bitters"],["simple syrup","sugar","syrup"]]},
+ {mood:"balanced",name:"Barchemy House Sour",needs:[["whiskey","bourbon","rye"],["lemon"],["simple syrup","syrup","sugar"]]},
+ {mood:"surprise",name:"Pineapple Sunset",needs:[["rum"],["pineapple"],["lime"],["simple syrup","syrup","sugar"]]}
+];
+function myBarSuggestion(preferred?:Mood): {mood?:Mood;response:string} {
  try {
  const raw=(globalThis as any).localStorage?.getItem("barchemy.mybar.v1");
  const items=raw?JSON.parse(raw):[];
- if(!Array.isArray(items))return null;
- const names=items.filter((x:any)=>x&&typeof x.name==="string").map((x:any)=>x.name.toLowerCase());
- const has=(s:string)=>names.some((n:string)=>n.includes(s));
- if(has("tequila")&&has("lime"))return {mood:"fruity",response:"Your tequila and lime are a great start for a Honey Lime Margarita. Check the recipe for honey syrup."};
- if((has("whiskey")||has("bourbon")||has("rye"))&&has("bitters"))return {mood:"bold",response:"Your whiskey and bitters are a great start for a Classic Old Fashioned. Check the recipe for any missing ingredients."};
- if(has("rum")&&has("pineapple"))return {mood:"surprise",response:"Your rum and pineapple are a great start for Pineapple Sunset. Check the recipe for citrus and syrup."};
- if((has("whiskey")||has("bourbon"))&&has("lemon"))return {mood:"balanced",response:"Your whiskey and lemon are a great start for the Barchemy House Sour. Check the recipe for syrup."};
- return null;
- }catch{return null;}
+ const names:string[]=Array.isArray(items)?items.filter((x:any)=>x&&typeof x.name==="string"&&x.category!=="Equipment").map((x:any)=>x.name.trim().toLowerCase()):[];
+ if(!names.length)return {response:"Your My Bar is empty on this device. Add a few ingredients, then ask me again."};
+ const ranked=recipeOptions.map(recipe=>{
+  const matched=recipe.needs.map(group=>group.some(term=>names.some(name=>name.includes(term))));
+  return {...recipe,count:matched.filter(Boolean).length,missing:recipe.needs.filter((_,i)=>!matched[i]).map(group=>group[0])};
+ }).sort((a,b)=>((b.mood===preferred?0.5:0)+b.count/b.needs.length)-((a.mood===preferred?0.5:0)+a.count/a.needs.length));
+ const best=ranked[0];
+ if(!best.count)return {response:"I can see "+names.length+" items in My Bar, but none match the core ingredients of my current guided recipes. Tell me a flavor you enjoy, or add a spirit and mixer."};
+ const missing=best.missing.length?" You may still need: "+best.missing.join(", ")+".":" You've got the main flavor ingredients; check the recipe for ice, garnish, and exact measurements.";
+ return {mood:best.mood,response:"From your saved My Bar ingredients, "+best.name+" is the closest match ("+best.count+" of "+best.needs.length+" core ingredient groups)."+missing};
+ }catch{return {response:"I couldn't read My Bar on this device. Open My Bar to check your saved ingredients."};}
 }
 
 export function ErrorBoundary({error,retry}:{error:Error;retry:()=>void}) {
@@ -40,19 +48,21 @@ export default function Ask() {
    const text=draft.trim();
    if(!text)return;
    const q=text.toLowerCase();
-   const zero=/mocktail|non.alcohol|no alcohol|zero.proof|without alcohol|sober/.test(q);
+   const zero=/mocktail|non.alcohol|no alcohol|zero.proof|without alcohol|sober|alcohol.free/.test(q);
+   const wantsBar=/ingredient|my bar|what i have|have at home|make with|use what i have|on hand|in my kitchen/.test(q);
+   const preference: Mood|undefined=/bold|strong|bourbon|whiskey|old fashioned|rye/.test(q)?"bold":/fruit|tropical|sweet|margarita|tequila/.test(q)?"fruity":/balanced|sour|lemon/.test(q)?"balanced":/surprise|rum|pineapple/.test(q)?"surprise":undefined;
    let mood:Mood|undefined;
    let response:string;
-   const wantsBar=/ingredient|my bar|what i have|have at home|make with|use what i have/.test(q);
-   const match=wantsBar?myBarSuggestion():null;
-   if(match){mood=match.mood;response=match.response;}
-   else if(wantsBar) response="I don't see a close match among my four guided recipes yet. Check your saved ingredients in My Bar, or choose a flavor mood below.";
-   else if(zero) response="For a zero-proof option, try citrus, a little syrup, and sparkling water. Our guided cocktail recipes contain alcohol.";
-   else if(/fruit|tropical|sweet|margarita|tequila/.test(q)){mood="fruity";response="Try a Honey Lime Margarita! It's fresh and citrusy.";}
-   else if(/bold|strong|bourbon|whiskey|old fashioned|rye/.test(q)){mood="bold";response="Try a Classic Old Fashioned, a spirit-forward favorite.";}
-   else if(/surprise|rum|pineapple/.test(q)){mood="surprise";response="How about a Pineapple Sunset? It's tropical and refreshing.";}
-   else if(/shake|stir|jigger|measure|technique|learn/.test(q)) response="Shaking suits citrus drinks; stirring suits spirit-forward cocktails. Barchemy Academy has lessons on both.";
-   else {mood="balanced";response="Let's start with the Barchemy House Sour, or choose a mood below.";}
+   if(zero) response="Absolutely! For a zero-proof drink, try fresh citrus, a little syrup, and sparkling water over ice. My four guided recipes currently contain alcohol, so I won't link you to those as mocktails.";
+   else if(wantsBar){const result=myBarSuggestion(preference);mood=result.mood;response=result.response;}
+   else if(/shake|stir|jigger|measure|technique|learn|academy/.test(q)) response="Here's a bartender tip: shake drinks with citrus to chill and blend them; stir spirit-forward drinks for a silky finish. Barchemy Academy has hands-on lessons, too.";
+   else if(/less sweet|not sweet|dry|tart/.test(q)){mood="balanced";response="Looking for less sweetness? Try the House Sour and start with a little less syrup, then taste and adjust. Want it more citrus-forward or more mellow?";}
+   else if(/refresh|light|summer|hot day/.test(q)){mood="fruity";response="For a bright, refreshing direction, I'd start with a Honey Lime Margarita. You can adjust the honey syrup to your taste.";}
+   else if(preference==="bold"){mood="bold";response="In the mood for something spirit-forward? The Classic Old Fashioned is rich, smooth, and stirred rather than shaken.";}
+   else if(preference==="fruity"){mood="fruity";response="Let's go citrusy! The Honey Lime Margarita combines tequila, lime, and honey syrup. Prefer tart or sweet?";}
+   else if(preference==="surprise"){mood="surprise";response="Surprise pour! Pineapple Sunset brings rum, pineapple, and lime together. Tropical enough for you?";}
+   else if(preference==="balanced"){mood="balanced";response="The Barchemy House Sour balances whiskey, lemon, and syrup. It's a lovely place to start.";}
+   else response="Tell me what flavors you enjoy—fruity, bold, tart, or refreshing—or ask what you can make with My Bar. I'll narrow it down with you.";
    setMessages(previous=>[...previous.slice(-18),{from:"guest",text},{from:"jbink",text:response,mood}]);
    setDraft("");
  }
@@ -60,7 +70,7 @@ export default function Ask() {
    <Link href="/home" style={styles.link}>← J.BINK'S BAR</Link>
    <Text style={styles.eyebrow}>ASK J.BINK</Text>
    <Text style={styles.title}>What are you in the mood for?</Text>
-   <Text style={styles.copy}>Chat with J.Bink's guided preview. Open-ended AI conversations are still in development.</Text>
+   <Text style={styles.copy}>J.Bink's guided preview now considers flavor preferences and saved My Bar ingredients. Open-ended AI chat is still in development.</Text>
    <View style={styles.card}><Text style={styles.copy}>Welcome! Tell me what flavors you like, or choose a drink below.</Text></View>
    {messages.map((item,index)=><View key={index} style={styles.card}>
      <Text style={styles.eyebrow}>{item.from==="guest"?"YOU":"J.BINK"}</Text>
