@@ -10,6 +10,7 @@ export default function Auth() {
   const [message, setMessage] = useState("");
 
   async function signIn() {
+    if (!supabase) { setMessage("Account services are unavailable. Please try again later."); return; }
     setLoading(true);
     setMessage("");
 
@@ -29,6 +30,7 @@ export default function Auth() {
   }
 
   async function signUp() {
+    if (!supabase) { setMessage("Account services are unavailable. Please try again later."); return; }
     setLoading(true);
     setMessage("");
 

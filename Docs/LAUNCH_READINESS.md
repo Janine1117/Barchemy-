@@ -21,3 +21,10 @@ Status: PRE-LAUNCH REVIEW — do not promote the existing live Stripe link yet.
 - [ ] Test a checkout without charging a real customer (Stripe sandbox) and verify correct fulfillment. A live payment test needs explicit owner approval.
 - [ ] Review navigation, account signup, saved-memory behavior, and J.Bink's current guided-preview limitations for marketing accuracy.
 - [ ] Only then share the live $9.99 link publicly.
+
+## Verification — November 6, 2026
+- J.Bink guided-response regression suite: 18 checks passed; TypeScript check and Expo web export passed.
+- HTTP GET checks: home, Ask, Academy, Memory Wall, Terms, Privacy, Refunds, and founder welcome return 200. This does not replace a Safari interaction test.
+- Stripe live account: existing Founder payment link active; no webhook endpoints configured. Purchase verification and reliable welcome-card delivery remain incomplete.
+- J.Bink remains a guided preview, not open-ended AI. Do not sell the proposed AI subscription until server-side generation, authenticated paid entitlements, usage enforcement, cancellation handling, and sandbox checkout/fulfillment tests pass.
+- Proposed future offer: J.Bink Plus at $2.99/month, with saved AI conversations and a clearly stated monthly allowance. Keep the $9.99 one-time Founder supporter offer separate.

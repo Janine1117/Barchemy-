@@ -79,7 +79,7 @@ export default function MyBar() {
       <Pressable accessibilityRole="button" style={s.addButton} onPress={add}><Text style={s.addText}>ADD TO MY BAR  +</Text></Pressable>
       {!!message&&<Text style={s.message}>{message}</Text>}
     </View>
-    <Text style={s.note}>Your ingredient collection is not yet synced with recipe recommendations or other devices.</Text>
+    <Text style={s.note}>J.Bink can match these saved ingredients to guided recipes on this device. Your collection does not sync across devices.</Text>
     <Link href="/experience" style={s.back}>← BARCHEMY EXPERIENCE</Link>
     <Link href="/ask" style={s.back}>ASK J.BINK →</Link>
     <Text style={s.toast}>Sip. Smile. Repeat. ✨</Text>
