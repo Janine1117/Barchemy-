@@ -17,7 +17,7 @@ export default function BottomNav() {
         const current = path === tab.href;
         return (
           <Link key={tab.href} href={tab.href} asChild>
-            <Pressable accessibilityRole="button" accessibilityLabel={tab.label} style={[s.tab, current && s.active]}>
+            <Pressable accessibilityRole="button" accessibilityLabel={tab.label} style={StyleSheet.flatten([s.tab, current && s.active])}>
               <Text style={[s.icon, current && s.activeText]}>{tab.icon}</Text>
               <Text style={[s.label, current && s.activeText]}>{tab.label}</Text>
             </Pressable>
