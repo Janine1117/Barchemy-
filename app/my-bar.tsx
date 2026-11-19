@@ -34,9 +34,17 @@ export default function MyBar() {
       }
     } catch { setMessage("Saved ingredients could not be loaded."); }
   },[]);
-  function store(next:Ingredient[]) {
-    setItems(next);
-    try { getStorage()?.setItem(STORAGE_KEY,JSON.stringify(next)); } catch { setMessage("Local saving is unavailable on this device."); }
+  function store(next:Ingredient[]): boolean {
+    try {
+      const target=getStorage();
+      if(!target) throw new Error("Browser storage is unavailable");
+      target.setItem(STORAGE_KEY,JSON.stringify(next));
+      setItems(next);
+      return true;
+    } catch {
+      setMessage("Changes could not be saved. Check browser storage settings and try again.");
+      return false;
+    }
   }
   function add() {
     const clean=name.trim();
@@ -44,13 +52,15 @@ export default function MyBar() {
     if(items.some(x=>x.name.toLowerCase()===clean.toLowerCase()&&x.category===category)){
       setMessage("That ingredient is already in this category."); return;
     }
-    store([...items,{name:clean,category}]);
-    setName("");
-    setMessage("Added to your bar on this device.");
+    if(store([...items,{name:clean,category}])) {
+      setName("");
+      setMessage("Added to your bar on this device.");
+    }
   }
   function remove(item:Ingredient) {
-    store(items.filter(x=>!(x.name===item.name&&x.category===item.category)));
-    setMessage("Ingredient removed.");
+    if(store(items.filter(x=>!(x.name===item.name&&x.category===item.category)))) {
+      setMessage("Ingredient removed.");
+    }
   }
   const categoryItems=items.filter(x=>x.category===category);
   return <ScrollView style={s.page} contentContainerStyle={s.container}>
