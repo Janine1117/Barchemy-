@@ -8,7 +8,7 @@ create table if not exists public.founder_purchases (
   stripe_checkout_session_id text not null unique,
   stripe_event_id text not null,
   email text,
-  amount_total integer not null check (amount_total = 999),
+  amount_total integer not null check (amount_total >= 0),
   currency text not null check (currency = 'usd'),
   status text not null check (status = 'paid'),
   welcome_delivery_status text not null default 'pending'
