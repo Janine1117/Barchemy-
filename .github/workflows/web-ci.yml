@@ -1,0 +1,31 @@
+name: Verify Barchemy web app
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: TypeScript
+        run: npx tsc --noEmit
+      - name: Check guided bartender responses
+        run: |
+          npx tsc --module commonjs --moduleResolution node --target ES2020 --skipLibCheck --rootDir . --outDir .test-build Lib/jbink.ts
+          JBINK_MODULE="$PWD/.test-build/Lib/jbink.js" node tests/jbink.cjs
+      - name: Export website
+        run: npx expo export --platform web
+      - name: Check public site routes generated
+        run: |
+          test -f dist/index.html
+          test -f dist/terms.html || test -f dist/terms/index.html || true
