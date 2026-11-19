@@ -27,7 +27,7 @@ jobs:
         with:
           deno-version: v2.x
       - name: Check Founder webhook types
-        run: deno check Supabase/functions/stripe-founder-webhook/index.ts
+        run: deno check --node-modules-dir=auto Supabase/functions/stripe-founder-webhook/index.ts
       - name: Export website
         run: npx expo export --platform web
       - name: Confirm website export exists
