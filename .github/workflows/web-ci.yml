@@ -25,7 +25,5 @@ jobs:
           JBINK_MODULE="$PWD/.test-build/Lib/jbink.js" node tests/jbink.cjs
       - name: Export website
         run: npx expo export --platform web
-      - name: Check public site routes generated
-        run: |
-          test -f dist/index.html
-          test -f dist/terms.html || test -f dist/terms/index.html || true
+      - name: Confirm website export exists
+        run: test -f dist/index.html
