@@ -7,7 +7,7 @@ create table if not exists public.ingredients (
 );
 create table if not exists public.memories (
  id uuid primary key default gen_random_uuid(), user_id uuid not null references auth.users(id) on delete cascade,
- title text not null, note text, created_at timestamptz not null default now()
+ title text not null, recipe text not null default '', created_at timestamptz not null default now()
 );
 alter table public.ingredients enable row level security;
 alter table public.memories enable row level security;

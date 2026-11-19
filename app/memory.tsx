@@ -29,9 +29,9 @@ export default function Memory() {
       if (!result.ok) {
         setMessage(result.message);
       } else if (result.memories.length === 0) {
-        setMessage("No memories saved yet. Save a cocktail from The First Pour.");
+        setMessage([result.message, "No memories saved yet. Save a cocktail from The First Pour."].filter(Boolean).join(" "));
       } else {
-        setMessage("");
+        setMessage(result.message);
       }
     } catch (error) {
       setMemories([]);
@@ -52,7 +52,7 @@ export default function Memory() {
 
       {message ? (
         <View style={s.card}>
-          <Text style={s.heading}>{loading ? "One moment…" : "Your memories live here."}</Text>
+          <Text style={s.heading}>{loading ? "One moment…" : "Memory Wall status"}</Text>
           <Text style={s.copy}>{message}</Text>
         </View>
       ) : null}
