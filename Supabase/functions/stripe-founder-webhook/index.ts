@@ -71,7 +71,8 @@ Deno.serve(async (request: Request): Promise<Response> => {
   if (!session || typeof session.id !== "string" ||
       event.livemode !== expectingLive || session.livemode !== expectingLive ||
       session.payment_link !== linkId || session.mode !== "payment" ||
-      session.payment_status !== "paid" || session.amount_total !== 999 ||
+      session.payment_status !== "paid" || session.amount_subtotal !== 999 ||
+      typeof session.amount_total !== "number" || session.amount_total < 0 ||
       String(session.currency).toLowerCase() !== "usd") {
     return respond(200, "Not a verified Founder purchase");
   }
@@ -85,7 +86,7 @@ Deno.serve(async (request: Request): Promise<Response> => {
     stripe_event_id: event.id,
     email: typeof email === "string" ? email : null,
     currency: "usd",
-    amount_total: 999,
+    amount_total: session.amount_total,
     status: "paid",
     welcome_delivery_status: "pending",
   });
