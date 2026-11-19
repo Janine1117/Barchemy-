@@ -11,45 +11,44 @@ export default function Auth() {
 
   async function signIn() {
     if (!supabase) { setMessage("Account services are unavailable. Please try again later."); return; }
+    if (!email.trim() || !password) { setMessage("Enter your email and password."); return; }
     setLoading(true);
     setMessage("");
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password,
-    });
-
-    setLoading(false);
-
-    if (error) {
-      setMessage(error.message);
-      return;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(), password,
+      });
+      if (error) { setMessage(error.message); return; }
+      router.replace("/home");
+    } catch {
+      setMessage("Unable to connect to account services. Check your connection and try again.");
+    } finally {
+      setLoading(false);
     }
-
-    router.replace("/home");
   }
 
   async function signUp() {
     if (!supabase) { setMessage("Account services are unavailable. Please try again later."); return; }
-    setLoading(true);
-    setMessage("");
-
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-    });
-
-    setLoading(false);
-
-    if (error) {
-      setMessage(error.message);
+    if (!email.trim() || password.length < 8) {
+      setMessage("Enter a valid email and a password with at least eight characters.");
       return;
     }
-
-    if (data.session) {
-      router.replace("/home");
-    } else {
-      setMessage("Account created. Check your email to confirm your account.");
+    setLoading(true);
+    setMessage("");
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(), password,
+      });
+      if (error) { setMessage(error.message); return; }
+      if (data.session) {
+        router.replace("/home");
+      } else {
+        setMessage("Account created. Check your email to confirm your account.");
+      }
+    } catch {
+      setMessage("Unable to create an account right now. Check your connection and try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
