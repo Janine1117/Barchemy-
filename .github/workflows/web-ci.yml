@@ -23,6 +23,11 @@ jobs:
         run: |
           npx tsc --module commonjs --moduleResolution node --target ES2020 --skipLibCheck --rootDir . --outDir .test-build Lib/jbink.ts
           JBINK_MODULE="$PWD/.test-build/Lib/jbink.js" node tests/jbink.cjs
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Check Founder webhook types
+        run: deno check Supabase/functions/stripe-founder-webhook/index.ts
       - name: Export website
         run: npx expo export --platform web
       - name: Confirm website export exists
