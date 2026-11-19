@@ -1,0 +1,50 @@
+name: Audit Barchemy dependencies
+
+on:
+  pull_request:
+    paths:
+      - package.json
+      - .github/workflows/dependency-audit.yml
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --no-audit --no-fund
+      - name: Show production and full dependency advisories
+        run: |
+          npm audit --omit=dev --json > production-audit.json || true
+          npm audit --json > all-audit.json || true
+          node <<'NODE'
+          for (const [label,file] of [['production','production-audit.json'],['all','all-audit.json']]) {
+            const audit = require('./' + file);
+            const vulns = Object.entries(audit.vulnerabilities || {});
+            console.log('AUDIT', label, JSON.stringify(audit.metadata?.vulnerabilities));
+            for (const [name,info] of vulns.filter(([,item]) => ['critical','high','moderate'].includes(item.severity))) {
+              const via = (info.via || []).map(v => typeof v === 'string' ? v : (v.url || v.title || v.name));
+              console.log(JSON.stringify({name, severity:info.severity, range:info.range, direct:info.isDirect, fix:info.fixAvailable, via}));
+            }
+          }
+          NODE
+
+      - name: Trial compatible npm audit repairs in CI only
+        run: |
+          npm audit fix --omit=dev --no-fund --no-audit || true
+          npm audit --omit=dev --json > audit-after-fix.json || true
+          node <<'NODE'
+          const r = require('./audit-after-fix.json');
+          console.log('AFTER NONBREAKING FIX', JSON.stringify(r.metadata?.vulnerabilities));
+          for (const [name, info] of Object.entries(r.vulnerabilities || {})) {
+            if (info.severity === 'high' || info.severity === 'critical') {
+              console.log(JSON.stringify({name, severity:info.severity, range:info.range, fix:info.fixAvailable}));
+            }
+          }
+          NODE
+          npm ls image-size postcss --all || true
