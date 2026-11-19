@@ -33,3 +33,18 @@ jobs:
             }
           }
           NODE
+
+      - name: Trial compatible npm audit repairs in CI only
+        run: |
+          npm audit fix --omit=dev --no-fund --no-audit || true
+          npm audit --omit=dev --json > audit-after-fix.json || true
+          node <<'NODE'
+          const r = require('./audit-after-fix.json');
+          console.log('AFTER NONBREAKING FIX', JSON.stringify(r.metadata?.vulnerabilities));
+          for (const [name, info] of Object.entries(r.vulnerabilities || {})) {
+            if (info.severity === 'high' || info.severity === 'critical') {
+              console.log(JSON.stringify({name, severity:info.severity, range:info.range, fix:info.fixAvailable}));
+            }
+          }
+          NODE
+          npm ls image-size postcss --all || true
